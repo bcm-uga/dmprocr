@@ -1,6 +1,6 @@
 #' getDifferentialTable
 #'
-#' Generate differential methylation data table from beta value. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
+#' Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
 #'
 #' @param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names
 #' @param platform a dataframe with metadata types as columns names and probes ids as row names
