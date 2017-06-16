@@ -14,7 +14,7 @@ getDifferentialTable(data, platform, exp_group)
 \item{exp_group}{a dataframe of metadata about the samples. Rows are ids and columns information type.}
 }
 \description{
-This function generate a differential methylation data table from raw data. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
+Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
 }
 \examples{
 library(gsubfn)
@@ -42,4 +42,5 @@ exp_group <- as.data.frame(matrix(rep(1, 50),  10, 5), row.names = sampleId)
 
 ###generate platfrom
 platform  <-as.data.frame(matrix(rep(1, 50),  10, 5), row.names = idProbes)
+diff_table <- getDifferentialTable(data, platform, exp_group)
 }
