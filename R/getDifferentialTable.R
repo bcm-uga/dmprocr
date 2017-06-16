@@ -1,13 +1,13 @@
-#'getDifferentialTable
+#' getDifferentialTable
 #'
-#'This function generate a differential methylation data table from raw data. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
+#' Generate differential methylation data table from beta value. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control
 #'
-#'@param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names
-#'@param platform a dataframe with metadata types as columns names and probes ids as row names
-#'@param exp_group a dataframe of metadata about the samples. Rows are ids and columns information type.
+#' @param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names
+#' @param platform a dataframe with metadata types as columns names and probes ids as row names
+#' @param exp_group a dataframe of metadata about the samples. Rows are ids and columns information type.
 #'
-#'@export  
-#'@examples
+#' @export  
+#' @examples
 #' library(gsubfn)
 #' ###generate random samples ids  
 #' regexTum <- "^TCGA-.{2}-.{4}-01.{1}-.{3}-.{4}-.{2}$"
@@ -33,6 +33,8 @@
 #'
 #' ###generate platfrom
 #' platform  <-as.data.frame(matrix(rep(1, 50),  10, 5), row.names = idProbes)
+#' diff_table <- getDifferentialTable(data, platform, exp_group)
+
 
 
 getDifferentialTable <- function(data, platform, exp_group){
