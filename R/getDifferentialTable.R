@@ -7,14 +7,40 @@
 #'@param exp_group a dataframe of metadata about the samples. Rows are ids and columns information type.
 #'
 #'@export  
+#'@examples
+#' library(gsubfn)
+#' ###generate random samples ids  
+#' regexTum <- "^TCGA-.{2}-.{4}-01.{1}-.{3}-.{4}-.{2}$"
+#' regexWT <- "^TCGA-.{2}-.{4}-11.{1}-.{3}-.{4}-.{2}$"
+#'
+#' sampleId <- c(
+#'          sapply(1:6, function(x) {
+#'              gsub("\\^|\\$", "",
+#'              gsubfn("\\.{([[:digit:]]+)}",
+#'              ~ paste(rep(sample(c(LETTERS, 1:9), 1), n), collapse=""), regexTum)) }),
+#'          sapply(1:4, function(x) {
+#'              gsub("\\^|\\$", "",
+#'              gsubfn("\\.{([[:digit:]]+)}", 
+#'              ~ paste(rep(sample(c(LETTERS, 1:9), 1), n), collapse=""), regexWT)) })
+#'              )
+#' idProbes <- paste0(rep("probe", 10), 1:10) 
+#' data <- matrix(runif(100,0,1), 10, 10)
+#' colnames(data) <- sampleId
+#' rownames(data) <- idProbes
+#'
+#' ###generate exp_group
+#' exp_group <- as.data.frame(matrix(rep(1, 50),  10, 5), row.names = sampleId) 
+#'
+#' ###generate platfrom
+#' platform  <-as.data.frame(matrix(rep(1, 50),  10, 5), row.names = idProbes)
 
 
 getDifferentialTable <- function(data, platform, exp_group){
   
   ## get the names of ind by type
-  getTumoralRef       <- grep("^TCGA-.{2}-.{4}-01.{1}-.{3}-.{4}-.{2}$", colnames(data), perl = TRUE  ,value = TRUE)
-  getControlRef       <- grep("^TCGA-.{2}-.{4}-11.{1}-.{3}-.{4}-.{2}$", colnames(data), value = TRUE)
-  getOthersRef        <- grep("^TCGA-.{2}-.{4}-02", colnames(data), value = TRUE)
+  TumoralRef       <- grep("^TCGA-.{2}-.{4}-01.{1}-.{3}-.{4}-.{2}$", colnames(data), perl = TRUE  ,value = TRUE)
+  ControlRef       <- grep("^TCGA-.{2}-.{4}-11.{1}-.{3}-.{4}-.{2}$", colnames(data), value = TRUE)
+  OthersRef        <- grep("^TCGA-.{2}-.{4}-02", colnames(data), value = TRUE)
   
   #delete row all na
   ind                 <- apply(data, 1, function(x) all(is.na(x)))
@@ -23,13 +49,13 @@ getDifferentialTable <- function(data, platform, exp_group){
   
   
   #compute the mean of Control
-  meanControl         <- rowMeans(data[, getControlRef], na.rm = TRUE)
+  meanControl         <- rowMeans(data[, ControlRef], na.rm = TRUE)
   
   
-  #delete control & unwanted tum samples from data, exp_group...
-  data      <- data[, -which(colnames(data) %in% getControlRef)]
-  exp_group <- exp_group[-which(rownames(exp_group) %in% getControlRef), ] 
-
+  #keep only tum samples in data, exp_group...
+  data      <- data[, which(colnames(data) %in% TumoralRef)]
+  exp_group <- exp_group[which(rownames(exp_group) %in% TumoralRef), ] 
+  platform  <- platform[!ind, ]
   
   #Perfom differential methylation
   list  <- lapply(colnames(data), function(x){
@@ -40,6 +66,7 @@ getDifferentialTable <- function(data, platform, exp_group){
   AllDM               <- as.data.frame(AllDM)
   colnames(AllDM)     <- colnames(data)
   rownames(AllDM)     <- rownames(data)
+  
   
   #delete list 'cause it's heavy
   rm(list)
