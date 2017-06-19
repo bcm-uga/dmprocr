@@ -33,6 +33,8 @@
 #'
 #' ###generate platfrom
 #' platform  <-as.data.frame(matrix(rep(1, 50),  10, 5), row.names = idProbes)
+#' 
+#' ###get a methylation differential table
 #' diff_table <- getDifferentialTable(data, platform, exp_group)
 
 
