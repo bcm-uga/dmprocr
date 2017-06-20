@@ -13,7 +13,5 @@ Authors@R: c(
 Maintainer: Magali Richard <magali.richard@univ-grenoble-alpes.fr>
 License: CeCILL
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Depends: R(>= 2.10.0)
-
-
