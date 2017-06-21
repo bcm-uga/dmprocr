@@ -35,14 +35,14 @@ rownames(data) <- idProbes
 ###generate exp_group
 exp_group <- as.data.frame(matrix(rep("x", 40),  10, 4), row.names = sampleId)
 exp_group$ref <- rep(c("01","11"),5)
+
 ###generate platfrom
 platform  <-as.data.frame(matrix(rep("x", 50),  10, 5), row.names = idProbes)
 
-##get indx of ref
+###get indx of ref
 TumoralRef <- rownames(exp_group[exp_group$ref == "01", ])
 ControlRef <- rownames(exp_group[exp_group$ref == "11", ])
 
 ###get a methylation differential table
 diff_table <- dmTable(data, platform, exp_group, ControlRef = ControlRef, TumoralRef = TumoralRef)
-
 }
