@@ -4,45 +4,53 @@
 \alias{dmTable}
 \title{dmTable}
 \usage{
-dmTable(data, platform, exp_group, TumoralRef, ControlRef, NARM = TRUE)
+dmTable(data, platform, exp_grp, tumoral_ref, control_ref, RM_NA_ROWS = TRUE)
 }
 \arguments{
 \item{data}{A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.}
 
 \item{platform}{a dataframe with metadata types as columns names and probes ids as row names.}
 
-\item{exp_group}{a dataframe of metadata about the samples. Rows are ids and columns information type.}
+\item{exp_grp}{a dataframe of metadata about the samples. Rows are ids and columns information type.}
 
-\item{TumoralRef}{a vector of ids corresponding to tumoral samples.}
+\item{tumoral_ref}{a vector of ids corresponding to tumoral samples.}
 
-\item{ControlRef}{a vector of ids corresponding to control samples.}
+\item{control_ref}{a vector of ids corresponding to control samples.}
 
-\item{NARM}{will delete empty rows in data and platform if TRUE.}
+\item{RM_NA_ROWS}{will delete empty rows in data and platform if TRUE.}
 }
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
 }
 \examples{
-###generate random samples ids
-sampleId <- paste0(rep("sample", 10), 1:10)
-idProbes <- paste0(rep("probe", 10), 1:10)
+### generate random samples ids
+sample_id <- paste0(rep("sample_", 10), 1:10)
+probe_id <- paste0(rep("probe_", 10), 1:10)
 
-###generate data
+### generate data
 data <- matrix(runif(100,0,1), 10, 10)
-colnames(data) <- sampleId
-rownames(data) <- idProbes
+colnames(data) <- sample_id
+rownames(data) <- probe_id
+head(data)
+dim(data)
 
-###generate exp_group
-exp_group <- as.data.frame(matrix(rep("x", 40),  10, 4), row.names = sampleId)
-exp_group$ref <- rep(c("01","11"),5)
+### generate exp_grp
+exp_grp <- data.frame(ref=rep(c("case", "ctrl"), 5), 
+                      patientId=rep(1:5, each=2), 
+                      row.names=sample_id)
+head(exp_grp)
+dim(exp_grp)
 
-###generate platfrom
-platform  <-as.data.frame(matrix(rep("x", 50),  10, 5), row.names = idProbes)
+### generate platfrom
+platform <- as.data.frame(matrix(rep("x", 50),  10, 5), row.names=probe_id)
+head(platform)
+dim(platform)
 
-###get indx of ref
-TumoralRef <- rownames(exp_group[exp_group$ref == "01", ])
-ControlRef <- rownames(exp_group[exp_group$ref == "11", ])
+### get indx of ref
+tumoral_ref <- rownames(exp_grp[exp_grp$ref == "case", ])
+control_ref <- rownames(exp_grp[exp_grp$ref == "ctrl", ])
 
-###get a methylation differential table
-diff_table <- dmTable(data, platform, exp_group, ControlRef = ControlRef, TumoralRef = TumoralRef)
+### get a methylation differential table
+diff_table <- dmTable(data, platform, exp_grp, control_ref=control_ref, tumoral_ref=tumoral_ref)
 }
+
