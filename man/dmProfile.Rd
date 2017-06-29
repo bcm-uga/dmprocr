@@ -16,25 +16,31 @@ dmProfile(gene_study_info, win = 5000, interp.by = 20, slide = 0,
 
 \item{slide}{is the maximum width slide you'll alow when comparing two curve}
 
-\item{pf_pos_colname}{string matching the name of the column in the platform that contain the position information of probes
-
-examples
-meth_study          <- dmRandomDataset()
-tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
-control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
-diff_meth_study     <- dmTable(meth_study$data,
-                             meth_study$platform,
-                             meth_study$exp_grp,
-                             tumoral_ref,
-                             control_ref)
-bedline = meth_study$genes[2,]
-pf_chr_colname = "chr"
-pf_pos_colname = "pos"
-gene_study <- getMethylInfo(diff_meth_study,
-                                  bedline = genes, pf_chr_colname = "chr", pf_pos_colname = "pos")
-
-gene_profile <- dmProfile(gene_study,slide = 500, pf_pos_colname = "pos")}
+\item{pf_pos_colname}{string matching the name of the column in the platform that contain the position information of probes}
 }
 \description{
 Generate  differential methylation profile for genes around the transcription start side
+}
+\examples{
+### generate random samples ids
+randomDataset          <- dmRandomDataset()
+### get a methylation differential table
+meth_study          <- randomDataset$meth_study
+tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
+control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
+diff_meth_study     <- dmTable(meth_study$data,
+                              meth_study$platform,
+                              meth_study$exp_grp,
+                              tumoral_ref,
+                              control_ref)
+### get the gene probes information
+genes           <- randomDataset$genes[2,]
+pf_chr_colname  <- "chr"
+pf_pos_colname  <- "pos"
+gene_study      <- getMethylInfo(diff_meth_study,
+                                 bedline = genes,
+                                 pf_chr_colname = "chr",
+                                 pf_pos_colname = "pos")
+### build a profile with gene informations
+gene_dm_profile <- dmProfile(gene_study, slide = 500, pf_pos_colname = "pos")
 }

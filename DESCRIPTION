@@ -13,7 +13,7 @@ Authors@R: c(
     )
 Maintainer: Magali Richard <magali.richard@univ-grenoble-alpes.fr>
 Depends: R(>= 2.10.0)
-Imports: dplyr, magrittr, stats, signal, DESeq2
+Imports: dplyr, magrittr, stats, utils, signal, DESeq2
 License: CeCILL
 LazyData: TRUE
 RoxygenNote: 6.0.1
