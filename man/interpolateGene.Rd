@@ -2,7 +2,7 @@
 % Please edit documentation in R/interpolateGene.R
 \name{interpolateGene}
 \alias{interpolateGene}
-\title{InterpolateGene}
+\title{interpolateGene}
 \usage{
 interpolateGene(n, diff_table, probes_start, promoterPos, strand, win = 5000,
   slide = 0, interp.by = 20)
@@ -25,5 +25,9 @@ interpolateGene(n, diff_table, probes_start, promoterPos, strand, win = 5000,
 \item{interp.by}{is resolution at which the function interpolate the probes signal, default is 20.}
 }
 \description{
-build a curve from differential methylation matrix
+Build a curve from differential methylation value for one sample.
+}
+\examples{
+#This function is called by dmProfile and is not made to be used out of this context for now. 
+
 }

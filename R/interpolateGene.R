@@ -1,6 +1,6 @@
-#'InterpolateGene
+#'interpolateGene
 #'
-#'build a curve from differential methylation matrix 
+#'Build a curve from differential methylation value for one sample.
 #'
 #'
 #'@param n is a vector of index of the column of the data matrix (each corresponding to one sample).
@@ -11,6 +11,9 @@
 #'@param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 #'@param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
 #'@param interp.by is resolution at which the function interpolate the probes signal, default is 20.
+#'
+#'@examples
+#'#This function is called by dmProfile and is not made to be used out of this context for now. 
 #'
 #'@export
 interpolateGene <- function(n ,diff_table, probes_start, promoterPos, strand, win=5000, slide=0, interp.by=20){
