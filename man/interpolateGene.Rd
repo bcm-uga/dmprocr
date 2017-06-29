@@ -27,3 +27,7 @@ interpolateGene(n, diff_table, probes_start, promoterPos, strand, win = 5000,
 \description{
 Build a curve from differential methylation value for one sample.
 }
+\examples{
+#This function is called by dmProfile and is not made to be used out of this context for now. 
+
+}

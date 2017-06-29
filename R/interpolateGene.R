@@ -12,6 +12,9 @@
 #'@param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
 #'@param interp.by is resolution at which the function interpolate the probes signal, default is 20.
 #'
+#'@examples
+#'#This function is called by dmProfile and is not made to be used out of this context for now. 
+#'
 #'@export
 interpolateGene <- function(n ,diff_table, probes_start, promoterPos, strand, win=5000, slide=0, interp.by=20){
   
