@@ -8,7 +8,7 @@
 #'@param pf_chr_colname string matching the name of the column in the platform that contain the chromosome on which we find a probes
 #'@param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
 #'
-#'@example examples/example-dmRandomDadaset.R
+#'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
 #'@example examples/example-getMethylInfo.R
 #'

@@ -22,6 +22,8 @@ getMethylInfo(diff_meth_study, bedline, win = 5000,
 Return a subset of diff_meth_study list for a given gene bedline and a size of window
 }
 \examples{
+### generate random samples ids
+meth_study          <- dmRandomDataset()
 ### get a methylation differential table
 tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
 control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
@@ -30,9 +32,12 @@ diff_meth_study     <- dmTable(meth_study$data,
                               meth_study$exp_grp,
                               tumoral_ref,
                               control_ref)
-#get the gene probes information
+### get the gene probes information
 genes = meth_study$genes[2,]
 pf_chr_colname = "chr"
 pf_pos_colname = "pos"
-gene_study <- getMethylInfo(diff_meth_study, bedline = genes, pf_chr_colname = "chr", pf_pos_colname = "pos")
+gene_study <- getMethylInfo(diff_meth_study,
+                            bedline = genes,
+                            pf_chr_colname = "chr",
+                            pf_pos_colname = "pos")
 }
