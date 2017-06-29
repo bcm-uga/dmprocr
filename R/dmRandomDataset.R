@@ -2,7 +2,7 @@
 #' 
 #'Generate random meth_study to run the functions examples.
 #'
-#'@example examples/example-data.R
+#'@example examples/example-dmRandomDataset.R
 #'
 #'
 #'@export

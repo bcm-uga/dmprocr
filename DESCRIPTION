@@ -12,15 +12,8 @@ Authors@R: c(
     person("Daniel", "Jost", ,"daniel.jost@univ-grenoble-alpes.fr", "aut")
     )
 Maintainer: Magali Richard <magali.richard@univ-grenoble-alpes.fr>
-<<<<<<< HEAD
-Depends:Depends:
-    R(>= 2.10.0)
-Imports: dplyr, magrittr, stats, signal
-=======
-Depends:
-    R(>= 2.10.0)
+Depends: R(>= 2.10.0)
 Imports: dplyr, magrittr, stats, signal, DESeq2
->>>>>>> 8b89c2ea738cff30a72f9a6bbcede74fb2ee5efe
 License: CeCILL
 LazyData: TRUE
 RoxygenNote: 6.0.1

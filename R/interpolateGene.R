@@ -1,6 +1,6 @@
 #'interpolateGene
 #'
-#'build a curve from differential methylation matrix 
+#'Build a curve from differential methylation value for one sample.
 #'
 #'
 #'@param n is a vector of index of the column of the data matrix (each corresponding to one sample).
