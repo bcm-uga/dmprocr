@@ -1,4 +1,4 @@
-#'InterpolateGene
+#'interpolateGene
 #'
 #'build a curve from differential methylation matrix 
 #'

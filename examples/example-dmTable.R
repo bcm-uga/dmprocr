@@ -1,2 +1,8 @@
 ### get a methylation differential table
-diff_table <- dmTable(data, platform, exp_grp, control_ref=control_ref, tumoral_ref=tumoral_ref)
+tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
+control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
+diff_meth_study     <- dmTable(meth_study$data,
+                              meth_study$platform,
+                              meth_study$exp_grp,
+                              tumoral_ref,
+                              control_ref)

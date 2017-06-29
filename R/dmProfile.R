@@ -6,17 +6,33 @@
 #'@param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value
 #'@param slide is the maximum width slide you'll alow when comparing two curve
 #'@param interp.by is resolution at which the function interpolate the probes signal
+#'@param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
+#'
+#'examples
+#'meth_study          <- dmRandomDataset()
+#'tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
+#'control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
+#'diff_meth_study     <- dmTable(meth_study$data,
+#'                              meth_study$platform,
+#'                              meth_study$exp_grp,
+#'                              tumoral_ref,
+#'                              control_ref)
+#'bedline = meth_study$genes[2,]
+#'pf_chr_colname = "chr"
+#'pf_pos_colname = "pos"
+#'gene_study <- getMethylInfo(diff_meth_study,
+#'                                   bedline = genes, pf_chr_colname = "chr", pf_pos_colname = "pos")
+#'
+#'gene_profile <- dmProfile(gene_study,slide = 500, pf_pos_colname = "pos")
 #'
 #'@importFrom magrittr "%>%"
 #'
-#'
-#'
 #'@export
-dmProfile <- function(gene_study_info, win = 5000, interp.by = 20, slide = 0){
+dmProfile <- function(gene_study_info, win = 5000, interp.by = 20, slide = 0, pf_pos_colname="Start"){
   
   
   data        <- gene_study_info$data
-  probes_start<- gene_study_info$probes$Start
+  probes_start<- gene_study_info$probes[[pf_pos_colname]]
   n           <- seq_along(gene_study_info$data)
   promoterPos <- gene_study_info$promoterPos
   strand      <- gene_study_info$strand
@@ -31,7 +47,7 @@ dmProfile <- function(gene_study_info, win = 5000, interp.by = 20, slide = 0){
                       strand=strand,
                       win=win,
                       slide=slide)
-  big          <- do.call(rbind, allsample)
+  big       <- do.call(rbind, allsample)
   
   
   meanOfInter <- stats::aggregate(big[, 2], list(big$position), mean)

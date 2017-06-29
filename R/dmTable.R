@@ -9,12 +9,11 @@
 #'@param control_ref a vector of ids corresponding to control samples.
 #'@param RM_NA_ROWS will delete empty rows in data and platform if TRUE.
 #'
-#'@example examples/example-data.R
+#'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
 #'
 #'
 #'@export
-
 dmTable <- function(data, platform, exp_grp, tumoral_ref, control_ref,  RM_NA_ROWS=TRUE){
   #delete row all na
   if(RM_NA_ROWS){
@@ -50,8 +49,8 @@ dmTable <- function(data, platform, exp_grp, tumoral_ref, control_ref,  RM_NA_RO
   dim(platform)
   
   #And return a list of object
-  meth_study    <- list(data=AllDM, exp_grp=exp_grp, platform=platform)
+  diff_meth_study    <- list(data=AllDM, exp_grp=exp_grp, platform=platform)
   
-  return(meth_study)
+  return(diff_meth_study)
   
 }
