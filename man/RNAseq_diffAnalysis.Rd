@@ -15,14 +15,14 @@ RNAseq_diffAnalysis(data_trscr, exp_grp, gene_list,
 
 \item{gene_list}{A \code{gene_list} bedfile containing the genes to screen for differential expression.}
 
-\item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal (set on FALSE by default).}
+\item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).}
 
 \item{alpha}{A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.}
 
 \item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change}
 }
 \value{
-A \code{gene_list} table include log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
+A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
 }
 \description{
 Perform differential analysis of transcriptomic data (RNAseq) using DESeq2 R package.
