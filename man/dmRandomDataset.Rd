@@ -11,5 +11,5 @@ Generate random meth_study to run the functions examples.
 }
 \examples{
 ### generate random samples ids
-meth_study          <- dmRandomDataset()
+randomDataset          <- dmRandomDataset()
 }
