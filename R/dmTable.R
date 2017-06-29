@@ -11,7 +11,7 @@
 #'
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
-#'
+#'@example examples/example-getalldmProfile.R
 #'
 #'@export
 dmTable <- function(data, platform, exp_grp, tumoral_ref, control_ref,  RM_NA_ROWS=TRUE){
