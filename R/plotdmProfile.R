@@ -18,15 +18,15 @@ plotdmProfile <- function(dmprofileList){
     profile$sd <- sqrt(profile[, 3])
     name <- profile[, 5]
     
-    p1 <- ggplot(profile) +
-      geom_line(aes(x = x, y= y), size = 0.5, color = "red") +
-      geom_ribbon(aes(x= x, ymin= y - sd, ymax= y + sd), fill = "grey70", alpha = 0.8) +
+    p1 <- ggplot2::ggplot(profile) +
+      ggplot2::geom_line(ggplot2::aes_string(x = "x", y= "y"), size = 0.5, color = "red") +
+      ggplot2::geom_ribbon(ggplot2::aes_string(x= "x", ymin= "y" - stats::sd, ymax= "y" + stats::sd), fill = "grey70", alpha = 0.8) +
       #theme
-      geom_vline(xintercept = 0, alpha = 0.8) +
-      geom_hline(yintercept = 0, alpha= 0.8) + 
-      coord_cartesian(ylim = c(-1,1), xlim = c(min(profile$x), max(profile$x))) +
-      theme(legend.position="none") +
-      ggtitle(name)
+      ggplot2::geom_vline(xintercept = 0, alpha = 0.8) +
+      ggplot2::geom_hline(yintercept = 0, alpha= 0.8) + 
+      ggplot2::coord_cartesian(ylim = c(-1,1), xlim = c(min(profile$x), max(profile$x))) +
+      ggplot2::theme(legend.position="none") +
+      ggplot2::ggtitle(name)
     
     return(p1)
   })
