@@ -1,4 +1,4 @@
-#'eucli.dist 
+#'eucli_dist 
 #'
 #'A function to compute adapted eucliddean distance on differential methylation profile. This function is called by dmDistance and dmDistance_translocate functions. 
 #'
@@ -10,7 +10,8 @@
 #'@example examples/example-getalldmProfile.R
 #'@example examples/example-eucli_dist.R
 #'
-eucli.dist <- function(m1, m2){ #where m1 and m2 are methylation profile
+#'@export
+eucli_dist <- function(m1, m2){ #where m1 and m2 are methylation profile
   ##here we go, first the distance
   D.probe <-  (m1$y - m2$y)^2 / (m1$var + m2$var)
   

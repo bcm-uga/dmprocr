@@ -6,6 +6,12 @@
 #'@param dmprofileList a list of dmProfile 
 #'@param frechet a boolean specify if frechet distance will be computed.
 #'
+#'@example examples/example-dmRandomDataset.R
+#'@example examples/example-dmTable.R
+#'@example examples/example-getalldmProfile.R
+#'@example examples/example-dmDistance
+#'
+#'
 #'@export
 dmDistance <- function(dmprofileList, frechet = FALSE){
   
@@ -21,12 +27,12 @@ dmDistance <- function(dmprofileList, frechet = FALSE){
       
       if(frechet){
         
-        frech.dist <- distFrechet(Px = m1$x, Py = m1$y, Qx = m2$x, Qy = m2$y)          
+        frech.dist <- kmlShape::distFrechet(Px = m1$x, Py = m1$y, Qx = m2$x, Qy = m2$y)          
         m[i,j] <- frech.dist
         
       }else {
         
-        m[i,j] <- sqrt(eucli.dist(m1, m2))
+        m[i,j] <- sqrt(eucli_dist(m1, m2))
         
       }
       
