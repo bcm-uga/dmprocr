@@ -13,6 +13,7 @@
 #'
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
+#'@example examples/example-getalldmProfile.R
 #'
 #'@export
 getalldmProfile <- function(diff_meth_study, bedfile, nbProbes = 0, win = 5000, slide = 0, interp.by = 20, pf_chr_colname="Chromosome", pf_pos_colname="Start") {

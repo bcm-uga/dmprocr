@@ -40,4 +40,11 @@ diff_meth_study     <- dmTable(meth_study$data,
                               meth_study$exp_grp,
                               tumoral_ref,
                               control_ref)
+### get dmProfiles for multiple genes
+genes        <- randomDataset$genes 
+alldmProfile <- getalldmProfile(diff_meth_study,
+                                bedfile = genes, slide = 500,
+                                pf_chr_colname = "chr",
+                                pf_pos_colname = "pos")
+
 }
