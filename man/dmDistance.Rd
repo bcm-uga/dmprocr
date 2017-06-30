@@ -34,4 +34,7 @@ alldmProfile <- getalldmProfile(diff_meth_study,
                                 pf_chr_colname = "chr",
                                 pf_pos_colname = "pos")
 
+### get a squared distance matrix from a list of dmprofile 
+somedmProfile <-  alldmProfile[1:10] 
+matrix_dist <- dmDistance(dmprofileList = somedmProfile)
 }

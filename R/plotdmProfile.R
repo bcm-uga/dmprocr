@@ -7,7 +7,7 @@
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
 #'@example examples/example-getalldmProfile.R
-#'@example examples/example-plotdmProfile
+#'@example examples/example-plotdmProfile.R
 #'
 #'
 #'
@@ -20,7 +20,7 @@ plotdmProfile <- function(dmprofileList){
     
     p1 <- ggplot2::ggplot(profile) +
       ggplot2::geom_line(ggplot2::aes_string(x = "x", y= "y"), size = 0.5, color = "red") +
-      ggplot2::geom_ribbon(ggplot2::aes_string(x= "x", ymin= "y" - stats::sd, ymax= "y" + stats::sd), fill = "grey70", alpha = 0.8) +
+      ggplot2::geom_ribbon(ggplot2::aes(x= x, ymin= y - sd, ymax= y + sd), fill = "grey70", alpha = 0.8) +
       #theme
       ggplot2::geom_vline(xintercept = 0, alpha = 0.8) +
       ggplot2::geom_hline(yintercept = 0, alpha= 0.8) + 

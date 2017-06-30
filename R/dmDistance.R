@@ -9,7 +9,7 @@
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
 #'@example examples/example-getalldmProfile.R
-#'@example examples/example-dmDistance
+#'@example examples/example-dmDistance.R
 #'
 #'
 #'@export

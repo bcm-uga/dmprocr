@@ -5,7 +5,7 @@
 #'@param dmprofileList a list of dmProfile
 #'@param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 #'@param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
-#'@param interp.by is resolution at which the function interpolate the probes signal, default is 20.
+#'@param by.interp is resolution at which the function interpolate the probes signal, default is 20.
 #'
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
@@ -37,7 +37,7 @@ dmDistance_translocate <- function(dmprofileList, win=5000, slide=500, by.interp
       m2 <- m2[(1+bslide):(bwin*2+bslide), ]
       
       #str(listmi)
-      distvect <- sapply(listmi, eucli.dist, m2=m2)
+      distvect <- sapply(listmi, eucli_dist, m2=m2)
       distvect <- sqrt(distvect)
       
       

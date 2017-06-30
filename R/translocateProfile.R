@@ -6,7 +6,8 @@
 #'@param bslide is the slide value divided by the width of each bin in dmProfile (= by.interp)
 #'@param bwin is the window parameter divided by the width of each bin in dmProfile (= by.interp)
 #'
-#'@example #[warning]this function is not to be used outside of the context of dmDistance_translocate
+#'@examples
+#'#[warning]this function is not to be used outside of the context of dmDistance_translocate
 #'
 #'@export
 translocateProfile <- function(m1, bslide, bwin){

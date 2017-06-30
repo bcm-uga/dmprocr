@@ -31,4 +31,8 @@ alldmProfile <- getalldmProfile(diff_meth_study,
                                 pf_chr_colname = "chr",
                                 pf_pos_colname = "pos")
 
+### get a list of plot(s) from a list of profile(s)
+somedmProfile <-  alldmProfile[1:10] 
+plotlist <- plotdmProfile(somedmProfile)
+plotlist[[1]]
 }

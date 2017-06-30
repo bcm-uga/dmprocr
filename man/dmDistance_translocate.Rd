@@ -14,7 +14,7 @@ dmDistance_translocate(dmprofileList, win = 5000, slide = 500,
 
 \item{slide}{is the maximum width slide you'll alow when comparing two curve, default is 0.}
 
-\item{interp.by}{is resolution at which the function interpolate the probes signal, default is 20.}
+\item{by.interp}{is resolution at which the function interpolate the probes signal, default is 20.}
 }
 \description{
 Produce a list of two matrix : The distance matrix from a list of dmProfile. Each profile is translocated N times against another, we then keep the min(distance) in the matrix. The second matrix indicates which translocation returned the min(distance)
@@ -39,5 +39,6 @@ alldmProfile <- getalldmProfile(diff_meth_study,
                                 pf_pos_colname = "pos")
 
 ### get a distance matrix from a list of dmProfile while minimizing distance by translocating
-dblist <- dmDistance_translocate(dmprofileList = dmprofileList, slide = 500)
+somedmProfile <-  alldmProfile[1:10] 
+dblist <- dmDistance_translocate(dmprofileList = somedmProfile, slide = 500)
 }

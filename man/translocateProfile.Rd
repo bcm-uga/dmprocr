@@ -16,3 +16,7 @@ translocateProfile(m1, bslide, bwin)
 \description{
 Produce a list of length bslide + 1 where each element is a dmProfile dataframe translocated around the tss
 }
+\examples{
+#[warning]this function is not to be used outside of the context of dmDistance_translocate
+
+}

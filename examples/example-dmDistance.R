@@ -1,2 +1,3 @@
 ### get a squared distance matrix from a list of dmprofile 
-matrix_dist <- dmDistance(dmprofileList = dmprofileList)
+somedmProfile <-  alldmProfile[1:10] 
+matrix_dist <- dmDistance(dmprofileList = somedmProfile)

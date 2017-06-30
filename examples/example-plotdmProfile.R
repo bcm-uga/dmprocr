@@ -1,3 +1,4 @@
 ### get a list of plot(s) from a list of profile(s)
-plotlist <- plotdmProfile(list(gene_dm_profile))
+somedmProfile <-  alldmProfile[1:10] 
+plotlist <- plotdmProfile(somedmProfile)
 plotlist[[1]]
