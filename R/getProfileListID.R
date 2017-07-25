@@ -12,6 +12,6 @@ getProfileListID <- function(dmprofileList){
   
   geneIds <- sapply(dmprofileList, function(x){x$id[[1]]})
   
-  return(geneIds)  
+  return(as.vector(geneIds))  
   
 }
