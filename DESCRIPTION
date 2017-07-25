@@ -1,6 +1,6 @@
 Package: dmprocr
 Type: Package
-Title: An R package that performs differential methylation profiles clustering
+Title: A R package that performs differential methylation profiles clustering
 Description: The `dmprocr` package provides a workflow performing differential
     methylation profiles clustering.
 Version: 0.0.0.9000
