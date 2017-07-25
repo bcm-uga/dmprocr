@@ -1,6 +1,6 @@
 #'clustdmProfile
-#'
-#'Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to name of gene in each cluster selected
+#' 
+#'Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to get a list of geneNames in each cluster selected.
 #'
 #'@param mat a distance Matrix
 #'@param fill_NA boolean specifying if NA should be imputed, need to be kept TRUE for now if there are NA in the matrix
@@ -18,9 +18,7 @@ clustdmProfile <- function(mat, fill_NA = TRUE, geneLabels){
     }
   }
   
-  if(!geneLabels){  
-    geneLabels  <- 1:nrow(mat) 
-  } 
+ 
   colnames(mat) <- geneLabels
   rownames(mat) <- geneLabels
   
