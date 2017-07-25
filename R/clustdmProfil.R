@@ -6,7 +6,7 @@
 #'@param fill_NA boolean specifying if NA should be imputed, need to be kept TRUE for now if there are NA in the matrix
 #'@param geneLabels A vector of genes names or id, can be extracted from a list of dmProfile with getProfileId
 #'
-#'@return A list of 2 object, the hclust result and a list containing as much vectors of geneNames as the number of cluster selected.
+#'@return A list of 2 object, the hclust result and a list containing the name of genes for each vector
 #'
 #'@export
 clustdmProfile <- function(mat, fill_NA = TRUE, geneLabels){
