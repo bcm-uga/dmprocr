@@ -23,7 +23,7 @@ dmDistance_translocate <- function(dmprofileList, win=5000, slide=500, by.interp
   m  <- matrix(rep(NA, length(dmprofileList)*length(dmprofileList)), nrow = length(dmprofileList), ncol = length(dmprofileList))
   mK <- matrix(rep(NA, length(dmprofileList)*length(dmprofileList)), nrow = length(dmprofileList), ncol = length(dmprofileList))
   
-  for(i in 1:(length(dmprofileList)-1)){ 
+  for(i in 1:(length(dmprofileList))){ 
     
     m1 <- dmprofileList[[i]]
     
