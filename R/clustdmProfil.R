@@ -18,10 +18,12 @@ clustdmProfile <- function(mat, fill_NA = TRUE, geneLabels){
     }
   }
   
-  if(labels){
-    colnames(mat) <- geneLabels
-    rownames(mat) <- geneLabels
-  }
+  if(!geneLabels){  
+    geneLabels  <- 1:nrow(mat) 
+  } 
+  colnames(mat) <- geneLabels
+  rownames(mat) <- geneLabels
+  
   
   hclust_result <- stats::hclust(stats::as.dist(mat), method = "complete")
   
