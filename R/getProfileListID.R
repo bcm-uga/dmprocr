@@ -4,7 +4,8 @@
 #'
 #'@param dmprofileList a list of dmProfile
 #'
-#'@return This function return either a vector of gene names.
+#'@return This function return a vector of gene names.
+#'
 #'
 #'@export
 getProfileListID <- function(dmprofileList){
