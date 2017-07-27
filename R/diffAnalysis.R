@@ -25,8 +25,9 @@ RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "
   
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
-    filter_indiv = colnames(data_trscr)}
-  if (length(which(filter_indiv %in% colnames(countData))) != length(filter_indiv) ) {
+    filter_indiv = colnames(data_trscr)
+    }
+  if (length(which(filter_indiv %in% colnames(data_trscr))) != length(filter_indiv) ) {
     stop("ERROR, filter_indiv does not fit to indivuals present in the data matrix")
     }
   
@@ -65,9 +66,9 @@ RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "
 #' @param data_ntrscr A \code{data} matrix that contains normalized RNAseq counts (from DESeq2 analysis). Columns correspond to indivuals, row correspond to genes.
 #' @param data_cnv A \code{data} matrix that contains CNV data
 #' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.
-#' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
+#' @param gene_list A \code{gene_list} bedfile containing the genes for which the linear regression will be perform.
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
-#' @param tumor A factor indicating the label of pathological samples in the sample column, set to "01" by default
+#' @param contrast A vector containing the constrast to be used to read metadata
 #' @param cnv_filter A vector of two values indicating between which quantiles (for cnv data) the regression should be performed, by default set to c(0.025, 0.975). Should be set to FALSE if no filter is required.
 #' 
 #' @return A \code{gene_list} table including a z_score value associated with the linear model to the gene_list used in entry.
@@ -77,17 +78,17 @@ RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "
 #'
 #' @export
 
-RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv = "no_filter", tumor = "01", cnv_filter = c(0.025, 0.975)){
+RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("sample","01","11"), cnv_filter = c(0.025, 0.975)){
   
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
     filter_indiv = rownames(exp_grp)}
   
   #Select tumor samples for individual that display cnv and trscr data
-  tc_indivs = rownames(exp_grp[ exp_grp$sample == tumor &
-                                  exp_grp$trscr == 1 & 
-                                  exp_grp$cnv == 1 &
-                                  exp_grp$dmprocr_ID %in% filter_indiv, ])
+  cur = exp_grp[exp_grp[[contrast[1]]] == contrast[2], ] # selection of pathogical samples
+  tc_indivs = rownames(cur[cur$trscr == 1 & 
+                             cur$cnv == 1 &
+                             cur$dmprocr_ID %in% filter_indiv, ])
   
   #Generate dataframe for linear regression with a z_score corresponding to the standardized beta coefficient 
   
@@ -143,5 +144,72 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
   }
     
     result_list = merge(gene_list, data_reg, by='gene_id')
+    rownames(result_list) = result_list$gene_id
     return(result_list)
 }
+
+#---------------------------------------------
+#' Calculate differential expression on a subset of patient.
+#' 
+#' Calculate differential expression on a subset of patient, in particular those with no CNV
+#' @param data_ntrscr A \code{data} matrix that contains normalized RNAseq counts (from DESeq2 analysis). Columns correspond to indivuals, row correspond to genes.
+#' @param data_cnv A \code{data} matrix that contains CNV data
+#' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.
+#' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
+#' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param no_cnv_filter A vector of two values indicating the CNV values threshold for no CNV, by default set to c(-0.2, 0.2). 
+#' 
+#' @return A \code{gene_list} table including a noCNVlog2FC value associated with differential expression between sample without CNV.
+#'
+#' @export
+
+noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("sample","01","11"), no_cnv_filter = c(-0.2, 0.2)){
+  foo = apply (t(rownames(gene_list)), 2, function (gene) {
+    i = which(rownames(gene_list) == gene)
+    if (i %% 500 == 0){print (paste(gene,i, "/", length(rownames(gene_list)), sep=" "))}
+    
+    #identify samples with no CNVs
+    if (mean(data_cnv[gene,]) == 0) {
+      noCNVlog2FC = NA
+    } else if (mean(data_cnv[gene, ]) != 0){
+      idx_samples = colnames(data_cnv)[data_cnv[gene, ] > no_cnv_filter[1] 
+                                       & data_cnv[gene, ] < no_cnv_filter[2]]
+      cur = exp_grp[exp_grp$dmprocr_ID %in% idx_samples & exp_grp$trscr == 1, ]
+      idx_p = rownames(cur)[cur[[contrast[1]]] == contrast[2]] #look for pathological samples
+      idx_c = rownames(cur)[cur[[contrast[1]]] == contrast[3]] #look for ctrl samples
+      ntrscr_p = mean(as.numeric(data_ntrscr[gene,idx_p]))
+      ntrscr_c = mean(as.numeric(data_ntrscr[gene,idx_c]))
+      noCNVlog2FC = log2(ntrscr_p/ntrscr_c)
+    }
+    return(list(gene_id = gene, noCNVlog2FC = noCNVlog2FC ))
+  })
+  noCNV_data = do.call(rbind, foo)   
+  noCNV_data = data.frame(lapply(data.frame(noCNV_data, stringsAsFactors=FALSE), unlist), stringsAsFactors=FALSE)
+  result_list = merge(gene_list, noCNV_data, by='gene_id')
+  rownames(result_list) = result_list$gene_id
+  return(result_list)
+}
+
+#---------------------------------------------
+#' Generate a candidate table
+#' 
+#' @param gene_list A \code{gene_list} bedfile containing the log2FC, zscore and noCNVlog2FC values.
+#' @param t_padj A threshold p-value under which expression is significantly different by DESeq analysis
+#' @param t_z_score A threshold zscore value, candidate genes should display a zcore value such as -t_zscore<zscore<t_zscore
+#' @param t_noCNVlog2FC A threshold noCNVlog2FC, candidate genes should display a noCNVlog2FC value such as noCNVlog2FC > t_noCNVlog2FC or noCNVlog2FC < t_noCNVlog2FC
+#' 
+#' @return A \code{gene_list} table including of candidate genes
+#' @export
+
+
+select_candidates = function(gene_list, t_padj, t_z_score, t_noCNVlog2FC){
+  candidate_list = gene_list[!is.na(gene_list$z_score) & !is.na(gene_list$padj) & !is.na(gene_list$noCNVlog2FC), ]
+  candidate_list = candidate_list[candidate_list$z_score > (-t_z_score) & 
+                                    candidate_list$z_score < t_z_score &
+                                    candidate_list$padj < t_padj &
+                           (candidate_list$noCNVlog2FC > t_noCNVlog2FC | candidate_list$noCNVlog2FC < (-t_noCNVlog2FC) )  , ]
+  return(candidate_list)
+}
+
+  
