@@ -23,7 +23,7 @@ dmTable <- function(data, platform, exp_grp, tumoral_ref, control_ref,  RM_NA_RO
   }
   
   #compute the mean of Control
-  meanControl         <- rowMeans(data[, control_ref], na.rm = TRUE)
+  meanControl <- rowMeans(data[, colnames(data) %in% control_ref], na.rm = TRUE)
   
   #keep only tum samples in data, exp_grp...
   data    <- data[, colnames(data) %in% tumoral_ref]
