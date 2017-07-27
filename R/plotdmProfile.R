@@ -20,6 +20,7 @@ plotdmProfile <- function(dmprofileList){
     
     p1 <- ggplot2::ggplot(profile) +
       ggplot2::geom_line(ggplot2::aes(x, y), size = 0.5, color = "red") +
+      ggplot2::geom_line(ggplot2::aes(x, pond), size = 0.5, linetype = "dashed") +
       ggplot2::geom_ribbon(ggplot2::aes(x, ymin = y - std, ymax = y + std), 
                            fill = "grey70", alpha = 0.8) +
       #theme
