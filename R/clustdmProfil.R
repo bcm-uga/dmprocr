@@ -2,6 +2,8 @@
 #' 
 #'Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to get a list of geneNames in each cluster selected.
 #'
+#'Carefull, the function has been generating errors with less than 20 genes in the distance matrix.
+#'
 #'@param mat a distance Matrix
 #'@param fill_NA boolean specifying if NA should be imputed, need to be kept TRUE for now if there are NA in the matrix
 #'@param geneLabels A vector of genes names or id, can be extracted from a list of dmProfile with getProfileId
