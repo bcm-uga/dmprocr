@@ -4,18 +4,21 @@
 \alias{clustdmProfile}
 \title{clustdmProfile}
 \usage{
-clustdmProfile(mat, fill_NA = TRUE, labels)
+clustdmProfile(mat, fill_NA = TRUE, geneLabels)
 }
 \arguments{
 \item{mat}{a distance Matrix}
 
 \item{fill_NA}{boolean specifying if NA should be imputed, need to be kept TRUE for now if there are NA in the matrix}
 
-\item{labels}{A vector of genes names, can be extracted from a list of dmProfile with getProfileId}
+\item{geneLabels}{A vector of genes names or id, can be extracted from a list of dmProfile with getProfileId}
 }
 \value{
-A list of 2 object, the hclust result and a list containing as much vectors of geneNames as the number of cluster selected.
+A list of 2 object, the hclust result and a list containing the name of genes for each vector
 }
 \description{
-Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to name of gene in each cluster selected
+Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to get a list of geneNames in each cluster selected.
+}
+\details{
+Carefull, the function has been generating errors with less than 20 genes in the distance matrix.
 }

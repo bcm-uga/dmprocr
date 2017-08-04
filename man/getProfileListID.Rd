@@ -10,7 +10,7 @@ getProfileListID(dmprofileList)
 \item{dmprofileList}{a list of dmProfile}
 }
 \value{
-This function return either a vector of gene names.
+This function return a vector of gene names.
 }
 \description{
 Get a vector of Gene names from a list of dmProfile
