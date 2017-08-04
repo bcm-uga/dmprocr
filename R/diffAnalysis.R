@@ -11,17 +11,22 @@
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
 #' @param alpha A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
 #' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param fitType A DESeq fitting paramater, by default set to "parametric"
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
+#' 
+#' @example examples/example-generate_fakestudy.R
+#' @example examples/example-RNAseq_diffAnalysis.R
 #' 
 #' @importFrom DESeq2 "DESeqDataSetFromMatrix"
 #' @importFrom DESeq2 "DESeq"
 #' @importFrom DESeq2 "results"
 #' @importFrom DESeq2 "counts"
+#' @importFrom stats "as.formula"
 #'
 #' @export
 
-RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11")) {
+RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric") {
   
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
@@ -33,21 +38,21 @@ RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "
   
   #Generate the dds for DESeq2 (we start from a count matrix)
   countData <- data_trscr[gene_list$gene_id,  filter_indiv] #data matrix
-  colData <- exp_grp[filter_indiv, c("dmprocr_ID", "sample")]  #sample type 
+  colData = exp_grp[filter_indiv, ]
   
   #Check wether columns ids of the count matrix corresponds to rows ids of the column data 
-  if (length(which(rownames(colData) == colnames(countData))) != ncol(countData) ) {
-    stop("ERROR, exp_grp does not correspond to data matrix")
-    }
+  #if (length(which(rownames(colData) == colnames(countData))) != ncol(countData) ) {
+  #  stop("ERROR, exp_grp does not correspond to data matrix")
+  #  }
   
   #Construct a DESeqDataSet
-  colData$sample <- as.factor(colData$sample)
+  colData[[contrast[1]]] = as.factor(colData[[contrast[1]]])
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = countData,
                                 colData = colData,
-                                design = ~ sample)
-  
+                                design = as.formula(paste("~", as.factor(contrast[1]))))
+
   #Perform the differential analysis 
-  dds <- DESeq2::DESeq(dds)
+  dds <- DESeq2::DESeq(dds, fitType= fitType)
  
   #Extract the results of differential analysis
   res <- DESeq2::results(dds,alpha = alpha ,  contrast=contrast)

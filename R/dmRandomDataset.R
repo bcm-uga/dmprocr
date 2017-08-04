@@ -52,7 +52,7 @@ dmRandomDataset = function() {
 #---------------------------------------------
 #'Generate simulated dataset for dmprocr package.
 #'
-#'Generate transcriptome (HTseq counts), cnv (copy number segment) and methylation (beta values) for 100 genes, 500 methylation probes, in 50 samples.
+#'Generate transcriptome (HTseq counts), cnv (copy number segment) and methylation (beta values) for 500 genes, 9810 methylation probes, in 50 samples.
 #'
 #'@example examples/example-generate_fakestudy.R
 #'
@@ -60,7 +60,7 @@ dmRandomDataset = function() {
 #'@export
 generate_fakestudy = function() {
   # gene_list
-  start = unique(round(stats::runif(100)*1000000))
+  start = unique(round(stats::runif(500)*1000000))
   gene_list = data.frame(chr="chr1",
                          start =start,
                          stop = start + round(abs(stats:: rnorm(length(start)) * 10000)),
@@ -77,12 +77,13 @@ generate_fakestudy = function() {
   
   # exp_grp
   sample = rep(c("case", "ctrl"), 25)
+  gender = c(rep(c("F", "F", "M", "M"), 12), "F", "F")
   patient_ID = rep(1:25, each=2)
   dmprocr_ID = paste(patient_ID, sample, sep = "_")
   trscr = rep(1, 50)
   cnv = rep(1, 50)
   meth = rep(1, 50)
-  exp_grp = data.frame(dmprocr_ID, patient_ID, sample, trscr, cnv, meth,
+  exp_grp = data.frame(dmprocr_ID, patient_ID, sample, trscr, cnv, meth, gender,
                        row.names=dmprocr_ID)
   utils::head(exp_grp)
   dim(exp_grp)
@@ -108,21 +109,24 @@ generate_fakestudy = function() {
   rownames(data_trscr) = rownames(gene_list)
   colnames(data_trscr) = rownames(exp_grp)
   for (i in 1:dim(data_trscr)[1]){
-    if (i %% 10 == 1) { data_trscr[i, seq(1,50,2)] = data_trscr[i,seq(1,50,2)]*sample(c(1/(3:10), 3:10),1)} #generates deregulated genes in case samples
+    if (i %% 25 == 1) { data_trscr[i, seq(1,50,2)] = round(data_trscr[i,seq(1,50,2)]*sample(c(1/(3:10), 3:10),1))} #generates deregulated genes in case samples
   }
   utils::head(data_trscr)
+  dim(data_trscr)
   
   # data_cnv
   data_cnv = matrix(stats::rnorm(n = nrow(gene_list) * nrow(exp_grp), mean=0,  sd=0.4), nrow(gene_list), nrow(exp_grp))
   rownames(data_cnv) = rownames(gene_list)
   colnames(data_cnv) = rownames(exp_grp)
   utils::head(data_cnv)
-  
+  dim(data_cnv)
   
   # data_meth
   data_meth = matrix(stats::runif(nrow(pf_meth) * nrow(exp_grp),0,1), nrow(pf_meth), nrow(exp_grp))
   rownames(data_meth) = rownames(pf_meth)
   colnames(data_meth) = rownames(exp_grp)
+  utils::head(data_meth)
+  dim(data_meth)
   
   # study
   return(list(data_trscr = data_trscr,
