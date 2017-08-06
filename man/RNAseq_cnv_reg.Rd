@@ -29,3 +29,45 @@ A \code{gene_list} table including a z_score value associated with the linear mo
 \description{
 Perform linear regression on expression (counts) and CNV data.
 }
+\examples{
+### generate a list of simulated data_trscr, data_cnv, data_meth, gene_list, pf_meth and exp_grp.
+dmprocr_study = generate_fakestudy()
+
+### perform differential analysis of data_trscr data
+### fitType is set to "mean" because the simulated dataset is small (i.e. 500 genes)
+dmprocr_result = RNAseq_diffAnalysis(data_trscr = dmprocr_study$data_trscr, 
+                                     exp_grp = dmprocr_study$exp_grp, 
+                                     gene_list = dmprocr_study$gene_list, 
+                                     alpha = 0.05, 
+                                     contrast = c("sample","case","ctrl"),
+                                     fitType="mean")
+
+### perform differential analysis of data_trscr data only of female patient
+### fitType is set to "mean" because the simulated dataset is small (i.e. 500 genes)
+filter_indiv = rownames(dmprocr_study$exp_grp[dmprocr_study$exp_grp$gender == "F", ])
+dmprocr_result_f = RNAseq_diffAnalysis(data_trscr = dmprocr_study$data_trscr, 
+                                     exp_grp = dmprocr_study$exp_grp, 
+                                     gene_list = dmprocr_study$gene_list,
+                                     filter_indiv = filter_indiv,
+                                     alpha = 0.05, 
+                                     contrast = c("sample","case","ctrl"),
+                                     fitType="mean")
+
+### perform linear regression on data_trscr and data_cnv  (be careful to use normalized count data as input)
+dmprocr_lin_reg = RNAseq_cnv_reg(data_ntrscr = dmprocr_result$data_ntrscr, 
+                                     data_cnv = dmprocr_study$data_cnv,
+                                     exp_grp = dmprocr_study$exp_grp, 
+                                     gene_list = dmprocr_result$result_list, 
+                                     contrast = c("sample","case","ctrl"))
+
+### you can change the filter on CNV distribution and look only at a selected subset of indivuals (here females)
+filter_indiv = rownames(dmprocr_study$exp_grp[dmprocr_study$exp_grp$gender == "F", ])
+dmprocr_lin_reg_f =  RNAseq_cnv_reg(data_ntrscr = dmprocr_result$data_ntrscr, 
+                                 data_cnv = dmprocr_study$data_cnv,
+                                 exp_grp = dmprocr_study$exp_grp, 
+                                 gene_list = dmprocr_result$result_list,
+                                 filter_indiv = filter_indiv,
+                                 contrast = c("sample","case","ctrl"),
+                                 cnv_filter = c(0.05, 0.95))
+
+}
