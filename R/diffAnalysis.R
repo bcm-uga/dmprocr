@@ -56,7 +56,7 @@ RNAseq_diffAnalysis <- function(data_trscr, exp_grp, gene_list, filter_indiv = "
  
   #Extract the results of differential analysis
   res <- DESeq2::results(dds,alpha = alpha ,  contrast=contrast)
-  result_list = cbind(gene_list[,1:7], res[gene_list$gene_id, c("log2FoldChange","padj")])
+  result_list = as.data.frame(cbind(gene_list[,1:7], res[gene_list$gene_id, c("log2FoldChange","padj")]))
   
   #Generate the normalized data matrix
   data_ntrscr = DESeq2::counts(dds, normalized=TRUE)
