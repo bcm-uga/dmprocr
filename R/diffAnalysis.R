@@ -154,6 +154,7 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
     
     result_list = merge(gene_list, data_reg, by='gene_id')
     rownames(result_list) = result_list$gene_id
+    result_list = result_list[, which(colnames(result_list) == "gene_id")]
     return(result_list)
 }
 
@@ -202,6 +203,7 @@ noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_
   noCNV_data = data.frame(lapply(data.frame(noCNV_data, stringsAsFactors=FALSE), unlist), stringsAsFactors=FALSE)
   result_list = merge(gene_list, noCNV_data, by='gene_id')
   rownames(result_list) = result_list$gene_id
+  result_list = result_list[, which(colnames(result_list) == "gene_id")]
   return(result_list)
 }
 
