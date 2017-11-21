@@ -15,3 +15,4 @@ This function return a vector of gene names.
 \description{
 Get a vector of Gene names from a list of dmProfile
 }
+

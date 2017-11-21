@@ -36,3 +36,4 @@ somedmProfile <-  alldmProfile[1:10]
 plotlist <- plotdmProfile(somedmProfile)
 plotlist[[1]]
 }
+

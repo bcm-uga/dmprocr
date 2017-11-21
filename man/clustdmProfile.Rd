@@ -22,3 +22,4 @@ Plot a dendrogram from a distance matrix, select cluster by clicks on the graphi
 \details{
 Carefull, the function has been generating errors with less than 20 genes in the distance matrix.
 }
+

@@ -4,7 +4,7 @@
 \alias{dmProfile}
 \title{dmProfile}
 \usage{
-dmProfile(gene_study_info, win = 5000, interp.by = 20, slide = 0,
+dmProfile(gene_study_info, win = 5000, interp.by = 20, slide = 500,
   pf_pos_colname = "Start")
 }
 \arguments{
@@ -44,3 +44,4 @@ gene_study      <- getMethylInfo(diff_meth_study,
 ### build a profile with gene informations
 gene_dm_profile <- dmProfile(gene_study, slide = 500, pf_pos_colname = "pos")
 }
+

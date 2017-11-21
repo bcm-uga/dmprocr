@@ -13,3 +13,4 @@ Generate random meth_study to run the functions examples.
 ### generate random samples ids
 randomDataset          <- dmRandomDataset()
 }
+

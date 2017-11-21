@@ -20,3 +20,4 @@ Produce a list of length bslide + 1 where each element is a dmProfile dataframe 
 #[warning]this function is not to be used outside of the context of dmDistance_translocate
 
 }
+

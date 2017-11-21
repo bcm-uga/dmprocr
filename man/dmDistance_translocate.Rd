@@ -42,3 +42,4 @@ alldmProfile <- getalldmProfile(diff_meth_study,
 somedmProfile <-  alldmProfile[1:10] 
 dblist <- dmDistance_translocate(dmprofileList = somedmProfile, slide = 500)
 }
+

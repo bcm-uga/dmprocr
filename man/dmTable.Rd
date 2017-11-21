@@ -4,20 +4,14 @@
 \alias{dmTable}
 \title{dmTable}
 \usage{
-dmTable(data, platform, exp_grp, tumoral_ref, control_ref, RM_NA_ROWS = TRUE)
+dmTable(data, tumoral_ref, control_ref)
 }
 \arguments{
 \item{data}{A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.}
 
-\item{platform}{a dataframe with metadata types as columns names and probes ids as row names.}
-
-\item{exp_grp}{a dataframe of metadata about the samples. Rows are ids and columns information type.}
-
 \item{tumoral_ref}{a vector of ids corresponding to tumoral samples.}
 
 \item{control_ref}{a vector of ids corresponding to control samples.}
-
-\item{RM_NA_ROWS}{will delete empty rows in data and platform if TRUE.}
 }
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
@@ -35,3 +29,4 @@ diff_meth_study     <- dmTable(meth_study$data,
                               tumoral_ref,
                               control_ref)
 }
+

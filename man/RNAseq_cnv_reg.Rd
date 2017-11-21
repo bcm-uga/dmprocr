@@ -4,24 +4,26 @@
 \alias{RNAseq_cnv_reg}
 \title{Perform linear regression on expression and CNV data.}
 \usage{
-RNAseq_cnv_reg(data_ntrscr, data_cnv, exp_grp, gene_list,
-  filter_indiv = "no_filter", contrast = c("sample", "01", "11"),
-  cnv_filter = c(0.025, 0.975))
+RNAseq_cnv_reg(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv,
+  contrast = c("sample", "01", "11"), cnv_filter = c(0.025, 0.975),
+  apply_func = apply)
 }
 \arguments{
 \item{data_ntrscr}{A \code{data} matrix that contains normalized RNAseq counts (from DESeq2 analysis). Columns correspond to indivuals, row correspond to genes.}
 
 \item{data_cnv}{A \code{data} matrix that contains CNV data}
 
-\item{exp_grp}{A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.}
+\item{exp_grp}{A \code{exp_grp} data.frame that contains metadatas on \code{data_trscr} individuals.}
 
 \item{gene_list}{A \code{gene_list} bedfile containing the genes for which the linear regression will be perform.}
 
-\item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).}
+\item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal, all individual if missing.}
 
 \item{contrast}{A vector containing the constrast to be used to read metadata}
 
 \item{cnv_filter}{A vector of two values indicating between which quantiles (for cnv data) the regression should be performed, by default set to c(0.025, 0.975). Should be set to FALSE if no filter is required.}
+
+\item{apply_func}{Function to be used for apply.}
 }
 \value{
 A \code{gene_list} table including a z_score value associated with the linear model to the gene_list used in entry.
@@ -73,3 +75,4 @@ dmprocr_lin_reg_f =  RNAseq_cnv_reg(data_ntrscr = dmprocr_result$data_ntrscr,
                                  cnv_filter = c(0.05, 0.95))
 
 }
+

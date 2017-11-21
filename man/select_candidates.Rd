@@ -4,16 +4,16 @@
 \alias{select_candidates}
 \title{Generate a candidate table}
 \usage{
-select_candidates(gene_list, t_padj, t_z_score, t_noCNVlog2FC)
+select_candidates(gene_list, padj_thresh, z_score_thresh, noCNVlog2FC_thresh)
 }
 \arguments{
 \item{gene_list}{A \code{gene_list} bedfile containing the log2FC, zscore and noCNVlog2FC values.}
 
-\item{t_padj}{A threshold p-value under which expression is significantly different by DESeq analysis}
+\item{padj_thresh}{A threshold p-value under which expression is significantly different by DESeq analysis}
 
-\item{t_z_score}{A threshold zscore value, candidate genes should display a zcore value such as -t_zscore<zscore<t_zscore}
+\item{z_score_thresh}{A threshold zscore value, candidate genes should display a zcore value such as -t_zscore<zscore<t_zscore}
 
-\item{t_noCNVlog2FC}{A threshold noCNVlog2FC, candidate genes should display a noCNVlog2FC value such as noCNVlog2FC > t_noCNVlog2FC or noCNVlog2FC < t_noCNVlog2FC}
+\item{noCNVlog2FC_thresh}{A threshold noCNVlog2FC, candidate genes should display a noCNVlog2FC value such as noCNVlog2FC > noCNVlog2FC_thresh or noCNVlog2FC < noCNVlog2FC_thresh}
 }
 \value{
 A \code{gene_list} table including of candidate genes
@@ -93,3 +93,4 @@ candidates = select_candidates(gene_list = dmprocr_lin_reg_no_cnv,
 
 
 }
+
