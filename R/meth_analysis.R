@@ -5,14 +5,12 @@
 #'
 #' @param vec A numeric vector specifying differential methylation signal.
 #' @param probes_pos is a vector of probes position on the chromosome. 
+#' @param xf vector of probe positions
 #' @param tss the transcription start site on the same chromosome.
-#' @param strand is the strand from which the gene is red. 
 #' @param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 #' @param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
-#' @param interp.by is resolution at which the function interpolate the probes signal, default is 20.
 #'@export
-interpolate_gene = function(vec, probes_pos, tss, strand, win, slide, interp.by) {
-  xf         <- seq(tss - win - slide,  tss + win + slide, by = interp.by)
+interpolate_gene = function(vec, probes_pos, xf, tss, win, slide) {
   if (sum(!is.na(vec))==0) {
     return(rep(NA, length(xf)))
   }
@@ -46,10 +44,6 @@ interpolate_gene = function(vec, probes_pos, tss, strand, win, slide, interp.by)
   # points(xp_orig, yp_orig, pch=16, col=2)
   
   
-  # if (strand == "-") {
-  #   yf = rev(yf)
-  # }
-
   return(yf)
 }
 
@@ -65,12 +59,13 @@ interpolate_gene = function(vec, probes_pos, tss, strand, win, slide, interp.by)
 #' @param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value
 #' @param slide is the maximum width slide you'll alow when comparing two curve
 #' @param interp.by is resolution at which the function interpolate the probes signal
+#' @param mask_wide is mask wide of o probe
 #' @param pf_chr_colname string matching the name of the column in the platform that contain the chromosome information of probes
 #' @param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
 #' @param apply_func Function that will be used for apply.
 #' @importFrom stats var
 #'@export
-compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_colname, pf_chr_colname, win, slide, interp.by, apply_func=apply) {  
+compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_colname, pf_chr_colname, win, slide, interp.by, mask_wide, apply_func=apply) {  
   probe_idx = get_probe_names(gene   , 
     meth_platform=meth_platform      , 
     pf_pos_colname=pf_pos_colname    ,   
@@ -95,16 +90,17 @@ compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_coln
       data = t(data)
     }
 
+    xf         <- seq(tss - win - slide, tss + win + slide, by = interp.by)
+
     big2 = apply_func(
       data , 2,
       # vec = data[,5]
       interpolate_gene      ,
       probes_pos=probes_pos ,
+      xf=xf                 ,
       tss=tss               ,
-      strand=strand         ,
       win=win               ,
-      slide=slide           , 
-      interp.by=interp.by
+      slide=slide           
     )      
 
 
@@ -115,13 +111,12 @@ compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_coln
     # plot(varOfInter2, varOfInter[,2])
     # varOfInter2 == varOfInter[,2]
 
-    xf         <- seq(tss - win - slide, tss + win + slide, by = interp.by)
 
     pond = as.numeric(sapply(xf, function(x) {
       # 0
-      min(abs(x - probes_pos)) <= 20*interp.by
+      min(abs(x - probes_pos)) <= mask_wide
     }))
-    pond[varOfInter2==0] = 0
+    # pond[varOfInter2==0] = 0
 
     profile = data.frame(x=xf, y=meanOfInter2, var=varOfInter2, pond=pond, id=gene[[4]])
   
@@ -197,9 +192,6 @@ get_probe_names = function(
 #'@param profiles a list of dmProfile 
 #'@param frechet a boolean specify if frechet distance will be computed.
 #'
-#'@example examples/example-dmRandomDataset.R
-#'@example examples/example-dmTable.R
-#'
 #'
 #'@export
 dmDistance <- function(profiles, frechet = FALSE){
@@ -242,10 +234,6 @@ dmDistance <- function(profiles, frechet = FALSE){
 # #'@param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 # #'@param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
 # #'@param by.interp is resolution at which the function interpolate the probes signal, default is 20.
-# #'
-# #'@example examples/example-dmRandomDataset.R
-# #'@example examples/example-dmTable.R
-# #'@example examples/example-dmDistance_translocate.R
 # #'
 # #'@export
 # dmDistance_translocate <- function(dmprofileList, win=5000, slide=500, by.interp = 20){
@@ -306,8 +294,6 @@ dmDistance <- function(profiles, frechet = FALSE){
 #'
 #'@param meth_profiles a list of dmProfile
 #'@param i integer specifying the i-st profile to plot 
-#'@example examples/example-dmRandomDataset.R
-#'@example examples/example-dmTable.R
 #' @importFrom graphics lines
 #' @importFrom graphics plot
 #'
@@ -400,9 +386,6 @@ plotdmProfile <- function(meth_profiles, i=1){
 #'@param tumoral_ref a vector of ids corresponding to tumoral samples.
 #'@param control_ref a vector of ids corresponding to control samples.
 #'
-#'@example examples/example-dmRandomDataset.R
-#'@example examples/example-dmTable.R
-#'
 #'
 #'@export
 dmTable <- function(data, tumoral_ref, control_ref) {
@@ -421,9 +404,6 @@ dmTable <- function(data, tumoral_ref, control_ref) {
 # #'@param m1 is a dmProfile dataframe to translocate using bslide
 # #'@param bslide is the slide value divided by the width of each bin in dmProfile (= by.interp)
 # #'@param bwin is the window parameter divided by the width of each bin in dmProfile (= by.interp)
-# #'
-# #'@examples
-# #'#[warning]this function is not to be used outside of the context of dmDistance_translocate
 # #'
 # #'@export
 # translocateProfile <- function(m1, bslide, bwin){

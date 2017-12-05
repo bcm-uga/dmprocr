@@ -2,9 +2,6 @@
 #' 
 #'Generate random meth_study to run the functions examples.
 #'
-#'@example examples/example-dmRandomDataset.R
-#'
-#'
 #'@export
 dmRandomDataset = function() {
   # genes
@@ -53,9 +50,6 @@ dmRandomDataset = function() {
 #'Generate simulated dataset for dmprocr package.
 #'
 #'Generate transcriptome (HTseq counts), cnv (copy number segment) and methylation (beta values) for 500 genes, 9810 methylation probes, in 50 samples.
-#'
-#'@example examples/example-generate_fakestudy.R
-#'
 #'
 #'@export
 generate_fakestudy = function() {

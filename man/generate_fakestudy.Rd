@@ -9,9 +9,4 @@ generate_fakestudy()
 \description{
 Generate transcriptome (HTseq counts), cnv (copy number segment) and methylation (beta values) for 500 genes, 9810 methylation probes, in 50 samples.
 }
-\examples{
-### generate a list of simulated data_trscr, data_cnv, data_meth, gene_list, pf_meth and exp_grp.
-dmprocr_study = generate_fakestudy()
-
-}
 

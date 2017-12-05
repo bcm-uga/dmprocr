@@ -16,15 +16,4 @@ dmTable(data, tumoral_ref, control_ref)
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
 }
-\examples{
-### generate random samples ids
-randomDataset          <- dmRandomDataset()
-### get a methylation differential table
-meth_study          <- randomDataset$meth_study
-tumoral_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="case"]
-control_ref         <- rownames(meth_study$exp_grp)[meth_study$exp_grp$ref=="ctrl"]
-diff_meth_study     <- dmTable(meth_study$data,
-                              tumoral_ref,
-                              control_ref)
-}
 
