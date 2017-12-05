@@ -81,6 +81,8 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
 #' @importFrom DESeq2 "results"
 #' @importFrom DESeq2 "counts"
 #' @importFrom stats "as.formula"
+#' @importFrom stats wilcox.test
+#' @importFrom stats p.adjust
 #'
 #' @export
 
@@ -190,7 +192,7 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
       z_score = summary(mod)$coefficients[6]
     }
 
-    gene_id = gene
+    # gene_id = gene
     return(z_score)
   })
 

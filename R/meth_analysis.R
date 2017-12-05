@@ -46,9 +46,10 @@ interpolate_gene = function(vec, probes_pos, tss, strand, win, slide, interp.by)
   # points(xp_orig, yp_orig, pch=16, col=2)
   
   
-  if (strand == "-") {
-    yf = rev(yf)
-  }
+  # if (strand == "-") {
+  #   yf = rev(yf)
+  # }
+
   return(yf)
 }
 
@@ -67,6 +68,7 @@ interpolate_gene = function(vec, probes_pos, tss, strand, win, slide, interp.by)
 #' @param pf_chr_colname string matching the name of the column in the platform that contain the chromosome information of probes
 #' @param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
 #' @param apply_func Function that will be used for apply.
+#' @importFrom stats var
 #'@export
 compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_colname, pf_chr_colname, win, slide, interp.by, apply_func=apply) {  
   probe_idx = get_probe_names(gene   , 
@@ -133,7 +135,7 @@ compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_coln
 #' @param meth_platform A data frame describing CpG positions.
 #' @param up_str   An integer specifying up stream size (in bp).
 #' @param dwn_str  An integer specifying down stream size (in bp).
-#' @param pf_pos_colname string matching the name of the column in the platform that contain the chromosome on which we find a probes.
+#' @param pf_chr_colname string matching the name of the column in the platform that contain the chromosome on which we find a probes.
 #' @param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes.
 #' @return A vector of probe names
 #' @export
@@ -145,6 +147,14 @@ get_probe_names = function(
   up_str=5000                         , 
   dwn_str=5000                        
  ) {
+   
+  if (substr(meth_platform[1, pf_chr_colname], 1, 3) != "chr") {
+    meth_platform[,pf_chr_colname] = paste0("chr",meth_platform[,pf_chr_colname])
+  }
+  if (substr(gene[[1]], 1, 3) != "chr") {
+    gene[[1]] = paste0("chr",gene[[1]])
+  }
+    
   # get gene properties
   chr =            gene[[1]]
   strand =         gene[[6]]
@@ -184,17 +194,15 @@ get_probe_names = function(
 #'Perform either a frechet distance from the kmlShape package or the eucliddean distance modified from this package (default) between two dmProfile. Return a distance matrix.
 #'[warning]Carefully use the frechet distance as it can be heavy computing when dealing with large set of profile. Complexity of the profile also weight on the memory usage. 
 #'
-#'@param dmprofileList a list of dmProfile 
+#'@param profiles a list of dmProfile 
 #'@param frechet a boolean specify if frechet distance will be computed.
 #'
 #'@example examples/example-dmRandomDataset.R
 #'@example examples/example-dmTable.R
-#'@example examples/example-getalldmProfile.R
-#'@example examples/example-dmDistance.R
 #'
 #'
 #'@export
-dmDistance <- function(dmprofileList, frechet = FALSE){
+dmDistance <- function(profiles, frechet = FALSE){
   m  = sapply(profiles, "[[","y")
   v  = sapply(profiles, "[[","var")
   k  = sapply(profiles, "[[","pond")
@@ -214,3 +222,219 @@ dmDistance <- function(dmprofileList, frechet = FALSE){
   return(d)
 }
 
+
+
+
+
+
+
+
+
+
+
+
+#
+# #'dmDistance_translocate
+# #'
+# #'Produce a list of two matrix : The distance matrix from a list of dmProfile. Each profile is translocated N times against another, we then keep the min(distance) in the matrix. The second matrix indicates which translocation returned the min(distance)
+# #'
+# #'@param dmprofileList a list of dmProfile
+# #'@param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
+# #'@param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
+# #'@param by.interp is resolution at which the function interpolate the probes signal, default is 20.
+# #'
+# #'@example examples/example-dmRandomDataset.R
+# #'@example examples/example-dmTable.R
+# #'@example examples/example-dmDistance_translocate.R
+# #'
+# #'@export
+# dmDistance_translocate <- function(dmprofileList, win=5000, slide=500, by.interp = 20){
+#
+#   #transform bp in bins of bp.length = by.interp
+#   bwin   <- win / by.interp
+#   bslide <- slide / by.interp
+#
+#   #create empty matrix
+#   m  <- matrix(rep(NA, length(dmprofileList)*length(dmprofileList)), nrow = length(dmprofileList), ncol = length(dmprofileList))
+#   mK <- matrix(rep(NA, length(dmprofileList)*length(dmprofileList)), nrow = length(dmprofileList), ncol = length(dmprofileList))
+#
+#   for(i in 1:(length(dmprofileList))){
+#
+#     m1 <- dmprofileList[[i]]
+#
+#     listmi <- translocateProfile(m1, bslide, bwin)
+#
+#     # return(listmi)
+#     # for(j in (1+i):length(dmprofileList)){
+#     for(j in 1:length(dmprofileList)){
+#
+#       m2 <- dmprofileList[[j]]
+#       m2 <- m2[(1+bslide):(bwin*2+bslide), ]
+#
+#       #str(listmi)
+#       distvect <- sapply(listmi, eucli_dist, m2=m2)
+#       distvect <- sqrt(distvect)
+#
+#
+#       if(all(is.nan(distvect))){
+#         m[i,j]    <- NaN
+#         mK[i,j]   <- NaN
+#       }else{
+#         #distvect[k+slide+1]  <- sqrt(eucli.dist(m1, m2))
+#         m[i,j]    <- min(distvect, na.rm = TRUE)
+#         distvect[is.nan(distvect)] <- max(distvect, na.rm = TRUE)
+#         mK[i,j]   <- which.min(distvect) - bslide - 1
+#         # print(which.min(distvect))
+#       }
+#
+#     }
+#   }
+#   # dbmatrix <- list(dist=m, slide=mK)
+#   dbmatrix <-list(m = m, mK = mK)
+#   return(dbmatrix)
+# }
+
+
+
+
+
+
+
+#'plotdmProfile
+#'
+#'Produce a list of differential methylation profile plot with ggplot2.
+#'
+#'@param meth_profiles a list of dmProfile
+#'@param i integer specifying the i-st profile to plot 
+#'@example examples/example-dmRandomDataset.R
+#'@example examples/example-dmTable.R
+#' @importFrom graphics lines
+#' @importFrom graphics plot
+#'
+#'
+#'
+#'@export
+plotdmProfile <- function(meth_profiles, i=1){
+  i = names(meth_profiles)[i]
+  plot(meth_profiles[[i]]$x, meth_profiles[[i]]$y, ylim=0:1, main=names(meth_profiles)[i], type="l")
+  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$pond, col=2)
+  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$y + 2* sqrt(meth_profiles[[i]]$var), lty=2)
+  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$y - 2* sqrt(meth_profiles[[i]]$var), lty=2)
+  # plots  <- lapply(dmprofileList, function(profile){
+  #   profile$std <- sqrt(profile[, 3])
+  #   name <- profile[, 5]
+  #
+  #   p1 <- ggplot2::ggplot(profile) +
+  #     ggplot2::geom_line(ggplot2::aes(x, y), size = 0.5, color = "red") +
+  #     ggplot2::geom_line(ggplot2::aes(x, pond), size = 0.5, linetype = "dashed") +
+  #     ggplot2::geom_ribbon(ggplot2::aes(x, ymin = y - std, ymax = y + std),
+  #                          fill = "grey70", alpha = 0.8) +
+  #     #theme
+  #     ggplot2::geom_vline(xintercept = 0, alpha = 0.8) +
+  #     ggplot2::geom_hline(yintercept = 0, alpha= 0.8) +
+  #     ggplot2::coord_cartesian(ylim = c(-1,1), xlim = c(min(profile$x),
+  #                                                       max(profile$x))) +
+  #     ggplot2::theme(legend.position="none") +
+  #     ggplot2::ggtitle(name)
+  #
+  #   return(p1)
+  # })
+
+
+}
+
+
+
+
+
+# #'clustdmProfile
+# #'
+# #'Plot a dendrogram from a distance matrix, select cluster by clicks on the graphical window, click finish to get a list of geneNames in each cluster selected.
+# #'
+# #'Carefull, the function has been generating errors with less than 20 genes in the distance matrix.
+# #'
+# #'@param mat a distance Matrix
+# #'@param fill_NA boolean specifying if NA should be imputed, need to be kept TRUE for now if there are NA in the matrix
+# #'@param geneLabels A vector of genes names or id, can be extracted from a list of dmProfile with getProfileId
+# #'
+# #'@return A list of 2 object, the hclust result and a list containing the name of genes for each vector
+# #'
+# #'@export
+# clustdmProfile <- function(mat, fill_NA = TRUE, geneLabels){
+#
+#   if(fill_NA){
+#     for(i in 1:ncol(mat)){
+#       mat[is.na(mat[,i]), i] <- mean(c(mean(mat[,i], na.rm = TRUE),
+#                                        mean(mat[i,], na.rm = TRUE)))
+#     }
+#   }
+#
+#
+#   colnames(mat) <- geneLabels
+#   rownames(mat) <- geneLabels
+#
+#
+#   hclust_result <- stats::hclust(stats::as.dist(mat), method = "complete")
+#
+#   graphics::plot(hclust_result)
+#
+#   print("Plot ready for cluster selection...")
+#
+#   list_clust <- graphics::identify(hclust_result)
+#
+#   print("Selection over")
+#
+#   clust_res <- list(hclust_result = hclust_result, genes_clust = list_clust)
+#
+#   return(clust_res)
+#
+# }
+
+
+
+#'dmTable
+#'
+#'Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
+#'
+#'@param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.
+#'@param tumoral_ref a vector of ids corresponding to tumoral samples.
+#'@param control_ref a vector of ids corresponding to control samples.
+#'
+#'@example examples/example-dmRandomDataset.R
+#'@example examples/example-dmTable.R
+#'
+#'
+#'@export
+dmTable <- function(data, tumoral_ref, control_ref) {
+  meanControl <- rowMeans(data[, control_ref], na.rm = TRUE)
+  data    <- data[, tumoral_ref]
+  AllDM = data - meanControl  
+  return(AllDM)
+}
+
+
+#
+# #'translocateProfile
+# #'
+# #'Produce a list of length bslide + 1 where each element is a dmProfile dataframe translocated around the tss
+# #'
+# #'@param m1 is a dmProfile dataframe to translocate using bslide
+# #'@param bslide is the slide value divided by the width of each bin in dmProfile (= by.interp)
+# #'@param bwin is the window parameter divided by the width of each bin in dmProfile (= by.interp)
+# #'
+# #'@examples
+# #'#[warning]this function is not to be used outside of the context of dmDistance_translocate
+# #'
+# #'@export
+# translocateProfile <- function(m1, bslide, bwin){
+#
+#   listmi <- list()
+#
+#   for (k in -bslide:bslide){
+#
+#     listmi[[k+bslide+1]]  <- m1[(1+bslide+k):(bslide+2*bwin+k), ]
+#
+#   }
+#
+#   return(listmi)
+# }
