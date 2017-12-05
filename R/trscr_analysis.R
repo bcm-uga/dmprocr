@@ -15,8 +15,6 @@
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
 #' 
-#' @example examples/example-generate_fakestudy.R
-#' @example examples/example-RNAseq_diffAnalysis.R
 #' 
 #' @importFrom DESeq2 "DESeqDataSetFromMatrix"
 #' @importFrom DESeq2 "DESeq"
@@ -72,9 +70,6 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
 #' @param apply_func Function to be used for apply.
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
-#' 
-#' @example examples/example-generate_fakestudy.R
-#' @example examples/example-RNAseq_diffAnalysis.R
 #' 
 #' @importFrom DESeq2 "DESeqDataSetFromMatrix"
 #' @importFrom DESeq2 "DESeq"
@@ -145,9 +140,6 @@ fad_RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv 
 #' 
 #' @return A \code{gene_list} table including a z_score value associated with the linear model to the gene_list used in entry.
 #'
-#' @example examples/example-generate_fakestudy.R
-#' @example examples/example-RNAseq_diffAnalysis.R
-#' @example examples/example-RNAseq_cnv_reg.R
 #' 
 #' @importFrom stats "quantile"
 #' @importFrom stats "lm"
@@ -254,10 +246,6 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
 #' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
 #' @param no_cnv_filter A vector of two values indicating the CNV values threshold for no CNV, by default set to c(-0.2, 0.2). 
 #' 
-#' @example examples/example-generate_fakestudy.R
-#' @example examples/example-RNAseq_diffAnalysis.R
-#' @example examples/example-RNAseq_cnv_reg.R
-#' @example examples/example-noCNV_diffAnalysis.R
 #' 
 #' @return A \code{gene_list} table including a noCNVlog2FC value associated with differential expression between sample without CNV.
 #'
@@ -292,11 +280,6 @@ noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_
 #' @param z_score_thresh A threshold zscore value, candidate genes should display a zcore value such as -t_zscore<zscore<t_zscore
 #' @param noCNVlog2FC_thresh A threshold noCNVlog2FC, candidate genes should display a noCNVlog2FC value such as noCNVlog2FC > noCNVlog2FC_thresh or noCNVlog2FC < noCNVlog2FC_thresh
 #' 
-#' @example examples/example-generate_fakestudy.R
-#' @example examples/example-RNAseq_diffAnalysis.R
-#' @example examples/example-RNAseq_cnv_reg.R
-#' @example examples/example-noCNV_diffAnalysis.R
-#' @example examples/example-select_candidates.R
 #' 
 #' @return A \code{gene_list} table including of candidate genes
 #' @export
