@@ -11,7 +11,7 @@ interpolate_gene(vec, probes_pos, xf, tss, win, slide)
 
 \item{probes_pos}{is a vector of probes position on the chromosome.}
 
-\item{xf}{vector of probe positions}
+\item{xf}{coordinates of interpolation}
 
 \item{tss}{the transcription start site on the same chromosome.}
 

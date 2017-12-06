@@ -9,9 +9,9 @@ dmTable(data, tumoral_ref, control_ref)
 \arguments{
 \item{data}{A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.}
 
-\item{tumoral_ref}{a vector of ids corresponding to tumoral samples.}
+\item{tumoral_ref}{a vector of ids corresmasking to tumoral samples.}
 
-\item{control_ref}{a vector of ids corresponding to control samples.}
+\item{control_ref}{a vector of ids corresmasking to control samples.}
 }
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.

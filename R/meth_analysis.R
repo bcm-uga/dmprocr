@@ -4,8 +4,8 @@
 #'
 #'
 #' @param vec A numeric vector specifying differential methylation signal.
+#' @param xf coordinates of interpolation
 #' @param probes_pos is a vector of probes position on the chromosome. 
-#' @param xf vector of probe positions
 #' @param tss the transcription start site on the same chromosome.
 #' @param win is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 #' @param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
@@ -63,7 +63,6 @@ interpolate_gene = function(vec, probes_pos, xf, tss, win, slide) {
 #' @param pf_chr_colname string matching the name of the column in the platform that contain the chromosome information of probes
 #' @param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
 #' @param apply_func Function that will be used for apply.
-#' @importFrom stats var
 #'@export
 compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_colname, pf_chr_colname, win, slide, interp.by, mask_wide, apply_func=apply) {  
   probe_idx = get_probe_names(gene   , 
@@ -84,15 +83,13 @@ compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_coln
     strand       = gene[[6]]
     tss          = ifelse (strand == "+", as.numeric(gene[[2]]), as.numeric(gene[[3]]))
 
-    # profile = dmProfile(gene_study_info, slide=slide, pf_pos_colname=pf_pos_colname)
-    # return(profiles)
+    xf = seq(tss - win - slide, tss + win + slide, by = interp.by)
+
     if  (length(probe_idx) == 1) {
       data = t(data)
     }
 
-    xf         <- seq(tss - win - slide, tss + win + slide, by = interp.by)
-
-    big2 = apply_func(
+    big = apply_func(
       data , 2,
       # vec = data[,5]
       interpolate_gene      ,
@@ -100,31 +97,71 @@ compute_gene_meth_profile = function(gene, meth_data, meth_platform, pf_pos_coln
       xf=xf                 ,
       tss=tss               ,
       win=win               ,
-      slide=slide           
+      slide=slide
     )      
 
+    profile = from_big_to_profile(big, xf, probes_pos, mask_wide)
 
-    meanOfInter2 = apply(big2, 1, mean, na.rm=TRUE)
-    # plot(meanOfInter2, meanOfInter[,2])
-    # meanOfInter2 == meanOfInter[,2]
-    varOfInter2 = apply(big2, 1, var, na.rm=TRUE)
-    # plot(varOfInter2, varOfInter[,2])
-    # varOfInter2 == varOfInter[,2]
-
-
-    pond = as.numeric(sapply(xf, function(x) {
-      # 0
-      min(abs(x - probes_pos)) <= mask_wide
-    }))
-    # pond[varOfInter2==0] = 0
-
-    profile = data.frame(x=xf, y=meanOfInter2, var=varOfInter2, pond=pond, id=gene[[4]])
+    if (strand == "-") {
+      profile = profile[nrow(profile):1,]
+    }
   
     return(profile)
   }
 }
 
-#' A Function That Extracts Probe Names of a Corresponding Gene from Platform Data
+#' from_big_to_profile
+#'
+#' Transform a matrix of interpolated methylome signal of samples to a methyl;ome profile
+#'
+#' @param xf coordinates of interpolation
+#' @param big matrix of interpolated methylome signal of samples 
+#' @param probes_pos positions of probes 
+#' @param mask_wide is mask wide of o probe
+#' @importFrom stats var
+#'@export
+from_big_to_profile = function(big, xf, probes_pos, mask_wide) {
+  m = apply(big, 1, mean, na.rm=TRUE)
+  v = apply(big, 1, var, na.rm=TRUE)
+  mask = as.numeric(sapply(xf, function(x) {
+    min(abs(x - probes_pos)) <= mask_wide
+  }))
+  profile = data.frame(x=xf, y=m, var=v, mask=mask)
+  profile = cbind(profile, big)
+  return(profile)
+}
+
+
+
+#' plot_meth_profile
+#'
+#' Plot methylome profile for a gene.
+#'
+#' @param meth_profile a list of dmProfile
+#' @param alpha.f a numeric specifying transparency of convolved signal.
+#' @param ... args pass to plot
+#' @importFrom graphics lines
+#' @importFrom graphics plot
+#' @importFrom graphics matplot
+#' @importFrom grDevices adjustcolor
+#'
+#'@export
+plot_meth_profile <- function(meth_profile, alpha.f, ...){
+  plot(meth_profile$x, meth_profile$y, ylim=0:1, type="l", ...)
+  lines(meth_profile$x, meth_profile$mask, col=2)
+  lines(meth_profile$x, meth_profile$y + 2* sqrt(meth_profile$var), lty=2)
+  lines(meth_profile$x, meth_profile$y - 2* sqrt(meth_profile$var), lty=2)  
+  if (missing(alpha.f)) {
+    alpha.f=2/(ncol(meth_profile)-5)
+  }
+  matplot(meth_profile$x, meth_profile[,5:ncol(meth_profile)], col=adjustcolor(1, alpha.f=alpha.f), type="l", lty=1, lwd=3, add=TRUE)
+}
+
+
+
+
+
+#' A Function That Extracts Probe Names of a Corresmasking Gene from Platform Data
 #'
 #' @param gene A vector describing the gene (line of a bed file).
 #' @param meth_platform A data frame describing CpG positions.
@@ -184,6 +221,9 @@ get_probe_names = function(
   }
 }
 
+
+
+
 #'dmDistance
 #'
 #'Perform either a frechet distance from the kmlShape package or the eucliddean distance modified from this package (default) between two dmProfile. Return a distance matrix.
@@ -197,7 +237,7 @@ get_probe_names = function(
 dmDistance <- function(profiles, frechet = FALSE){
   m  = sapply(profiles, "[[","y")
   v  = sapply(profiles, "[[","var")
-  k  = sapply(profiles, "[[","pond")
+  k  = sapply(profiles, "[[","mask")
   d = matrix(0, nrow=ncol(m), ncol=ncol(m) )
   for (i in 1:(ncol(m)-1)) {
     for (j in (i+1):ncol(m)) {
@@ -218,6 +258,23 @@ dmDistance <- function(profiles, frechet = FALSE){
 
 
 
+
+#'dmTable
+#'
+#'Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
+#'
+#'@param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.
+#'@param tumoral_ref a vector of ids corresmasking to tumoral samples.
+#'@param control_ref a vector of ids corresmasking to control samples.
+#'
+#'
+#'@export
+dmTable <- function(data, tumoral_ref, control_ref) {
+  meanControl <- rowMeans(data[, control_ref], na.rm = TRUE)
+  data    <- data[, tumoral_ref]
+  AllDM = data - meanControl  
+  return(AllDM)
+}
 
 
 
@@ -288,50 +345,6 @@ dmDistance <- function(profiles, frechet = FALSE){
 
 
 
-#'plotdmProfile
-#'
-#'Produce a list of differential methylation profile plot with ggplot2.
-#'
-#'@param meth_profiles a list of dmProfile
-#'@param i integer specifying the i-st profile to plot 
-#' @importFrom graphics lines
-#' @importFrom graphics plot
-#'
-#'
-#'
-#'@export
-plotdmProfile <- function(meth_profiles, i=1){
-  i = names(meth_profiles)[i]
-  plot(meth_profiles[[i]]$x, meth_profiles[[i]]$y, ylim=0:1, main=names(meth_profiles)[i], type="l")
-  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$pond, col=2)
-  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$y + 2* sqrt(meth_profiles[[i]]$var), lty=2)
-  lines(meth_profiles[[i]]$x, meth_profiles[[i]]$y - 2* sqrt(meth_profiles[[i]]$var), lty=2)
-  # plots  <- lapply(dmprofileList, function(profile){
-  #   profile$std <- sqrt(profile[, 3])
-  #   name <- profile[, 5]
-  #
-  #   p1 <- ggplot2::ggplot(profile) +
-  #     ggplot2::geom_line(ggplot2::aes(x, y), size = 0.5, color = "red") +
-  #     ggplot2::geom_line(ggplot2::aes(x, pond), size = 0.5, linetype = "dashed") +
-  #     ggplot2::geom_ribbon(ggplot2::aes(x, ymin = y - std, ymax = y + std),
-  #                          fill = "grey70", alpha = 0.8) +
-  #     #theme
-  #     ggplot2::geom_vline(xintercept = 0, alpha = 0.8) +
-  #     ggplot2::geom_hline(yintercept = 0, alpha= 0.8) +
-  #     ggplot2::coord_cartesian(ylim = c(-1,1), xlim = c(min(profile$x),
-  #                                                       max(profile$x))) +
-  #     ggplot2::theme(legend.position="none") +
-  #     ggplot2::ggtitle(name)
-  #
-  #   return(p1)
-  # })
-
-
-}
-
-
-
-
 
 # #'clustdmProfile
 # #'
@@ -377,23 +390,6 @@ plotdmProfile <- function(meth_profiles, i=1){
 # }
 
 
-
-#'dmTable
-#'
-#'Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
-#'
-#'@param data A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.
-#'@param tumoral_ref a vector of ids corresponding to tumoral samples.
-#'@param control_ref a vector of ids corresponding to control samples.
-#'
-#'
-#'@export
-dmTable <- function(data, tumoral_ref, control_ref) {
-  meanControl <- rowMeans(data[, control_ref], na.rm = TRUE)
-  data    <- data[, tumoral_ref]
-  AllDM = data - meanControl  
-  return(AllDM)
-}
 
 
 #

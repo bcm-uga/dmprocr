@@ -2,7 +2,7 @@
 % Please edit documentation in R/meth_analysis.R
 \name{get_probe_names}
 \alias{get_probe_names}
-\title{A Function That Extracts Probe Names of a Corresponding Gene from Platform Data}
+\title{A Function That Extracts Probe Names of a Corresmasking Gene from Platform Data}
 \usage{
 get_probe_names(gene, meth_platform, pf_chr_colname = "Chromosome",
   pf_pos_colname = "Start", up_str = 5000, dwn_str = 5000)
@@ -24,6 +24,6 @@ get_probe_names(gene, meth_platform, pf_chr_colname = "Chromosome",
 A vector of probe names
 }
 \description{
-A Function That Extracts Probe Names of a Corresponding Gene from Platform Data
+A Function That Extracts Probe Names of a Corresmasking Gene from Platform Data
 }
 
