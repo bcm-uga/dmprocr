@@ -4,7 +4,7 @@
 \alias{interpolate_gene}
 \title{interpolate_gene}
 \usage{
-interpolate_gene(vec, probes_pos, xf, tss, win, slide)
+interpolate_gene(vec, probes_pos, xf, tss, updwn_str, slide)
 }
 \arguments{
 \item{vec}{A numeric vector specifying differential methylation signal.}
@@ -15,7 +15,7 @@ interpolate_gene(vec, probes_pos, xf, tss, win, slide)
 
 \item{tss}{the transcription start site on the same chromosome.}
 
-\item{win}{is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.}
+\item{updwn_str}{is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.}
 
 \item{slide}{is the maximum width slide you'll alow when comparing two curve, default is 0.}
 }

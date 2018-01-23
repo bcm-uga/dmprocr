@@ -5,7 +5,7 @@
 \title{compute_gene_meth_profile}
 \usage{
 compute_gene_meth_profile(gene, meth_data, meth_platform, pf_pos_colname,
-  pf_chr_colname, win, slide, interp.by, mask_wide, apply_func = apply)
+  pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func = apply)
 }
 \arguments{
 \item{gene}{A list that describe gene in bed format.}
@@ -18,11 +18,11 @@ compute_gene_meth_profile(gene, meth_data, meth_platform, pf_pos_colname,
 
 \item{pf_chr_colname}{string matching the name of the column in the platform that contain the chromosome information of probes}
 
-\item{win}{is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value}
+\item{updwn_str}{is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value}
 
 \item{slide}{is the maximum width slide you'll alow when comparing two curve}
 
-\item{interp.by}{is resolution at which the function interpolate the probes signal}
+\item{wig_size}{is resolution at which the function interpolate the probes signal}
 
 \item{mask_wide}{is mask wide of o probe}
 

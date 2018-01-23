@@ -4,16 +4,14 @@
 \alias{from_big_to_profile}
 \title{from_big_to_profile}
 \usage{
-from_big_to_profile(big, xf, probes_pos, mask_wide)
+from_big_to_profile(big, xf, mask)
 }
 \arguments{
 \item{big}{matrix of interpolated methylome signal of samples}
 
 \item{xf}{coordinates of interpolation}
 
-\item{probes_pos}{positions of probes}
-
-\item{mask_wide}{is mask wide of o probe}
+\item{mask}{is mask of o probe}
 }
 \description{
 Transform a matrix of interpolated methylome signal of samples to a methyl;ome profile
