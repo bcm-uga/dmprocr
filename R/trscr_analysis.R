@@ -12,6 +12,7 @@
 #' @param alpha A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
 #' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
 #' @param fitType A DESeq fitting paramater, by default set to "parametric"
+#' @param normalisation_factor A matrix of normalization to preempt DESeq2 sizeFactors. Optionnal (set on "no_factor" by default).
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
 #' 
@@ -21,10 +22,11 @@
 #' @importFrom DESeq2 "results"
 #' @importFrom DESeq2 "counts"
 #' @importFrom stats "as.formula"
+#' @importFrom DESeq2 "normalizationFactors"
 #'
 #' @export
 
-RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric") {  
+RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric", normalization_factor ="no_factor") {  
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
     filter_indiv = colnames(data_trscr)
@@ -44,6 +46,13 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = countData,
                                 colData = colData,
                                 design = as.formula(paste("~", as.factor(contrast[1]))))
+  
+  # If required, preempt normalization step
+  if (dim(normalization_factor)[1] > 1) {
+    print("Preempt sizeFactors")
+    DESeq2::normalizationFactors(dds) <- normalization_factor
+  }
+  
   #Perform the differential analysis 
   dds <- DESeq2::DESeq(dds, fitType= fitType)
   #Extract the results of differential analysis
@@ -55,6 +64,62 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
   data_ntrscr = DESeq2::counts(dds, normalized=TRUE)
   return(list(result_list = result_list, data_ntrscr = data_ntrscr))
 }
+
+# Authors: Magali Richard, CNRS
+# magali.richard@univ-grenoble-alpes.fr
+#
+#---------------------------------------------
+#' Normalize RNAseq data according to DESeq2 method.
+#' 
+#' Perform normalization of transcriptomic data (RNAseq) using DESeq2 R package.
+#' @param data_trscr A \code{data} matrix that contains transcriptome information (RNAseq counts from HTseq). Columns correspond to indivuals, row correspond to genes.
+#' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.
+#' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
+#' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
+#' @param alpha A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param fitType A DESeq fitting paramater, by default set to "parametric"
+#' 
+#' @return A list composed of a \code{data_ntrscr} matrix of normalized counts and a \code{size_factor} vector of normalization factors.
+#' 
+#' 
+#' @importFrom DESeq2 "DESeqDataSetFromMatrix"
+#' @importFrom DESeq2 "DESeq"
+#' @importFrom DESeq2 "results"
+#' @importFrom DESeq2 "counts"
+#' @importFrom stats "as.formula"
+#'
+#' @export
+
+RNAseq_normalization = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric") {  
+  if (filter_indiv[1] == "no_filter") {
+    print("all individuals will be used in the normalization process")
+    filter_indiv = colnames(data_trscr)
+  }
+  if (length(which(filter_indiv %in% colnames(data_trscr))) != length(filter_indiv) ) {
+    stop("ERROR, filter_indiv does not fit to indivuals present in the data matrix")
+  }  
+  #Generate the dds for DESeq2 (we start from a count matrix)
+  countData <- data_trscr[rownames(gene_list),  filter_indiv] #data matrix
+  colData = exp_grp[filter_indiv, ]
+  #Check wether columns ids of the count matrix corresponds to rows ids of the column data 
+  #if (length(which(rownames(colData) == colnames(countData))) != ncol(countData) ) {
+  #  stop("ERROR, exp_grp does not correspond to data matrix")
+  #  }
+  #Construct a DESeqDataSet
+  colData[[contrast[1]]] = as.factor(colData[[contrast[1]]])
+  dds <- DESeq2::DESeqDataSetFromMatrix(countData = countData,
+                                        colData = colData,
+                                        design = as.formula(paste("~", as.factor(contrast[1]))))
+
+  #Generate the normalized data matrix
+  dds = DESeq2::estimateSizeFactors(dds)
+  data_ntrscr = DESeq2::counts(dds, normalized=TRUE)
+  size_factor = DESeq2::sizeFactors(dds)
+   
+  return(list(data_ntrscr = data_ntrscr, size_factor = size_factor))
+}
+
 
 # Authors: Florent Chuffart, INSERM
 #
@@ -151,16 +216,16 @@ fad_RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv 
 RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv, contrast=c("sample","01","11"), cnv_filter = c(0.025, 0.975), apply_func=apply){
   if (missing(filter_indiv)) {
     print("all individuals will be used in the differential analysis")
-    filter_indiv = rownames(exp_grp)
+    filter_indiv = exp_grp$dmprocr_ID
   }
   # Select tumor samples for individual that display cnv and trscr data
   cur = exp_grp[exp_grp[[contrast[1]]] == contrast[2], ] # selection of pathogical samples
   tc_indivs = rownames(cur)[cur$trscr == 1 & cur$cnv == 1 & cur$dmprocr_ID %in% filter_indiv]
   # Generate data.frame for linear regression with a z_score corresponding to the standardized beta coefficient 
   if (length(cnv_filter) == 1) {
-    print("patient are not filter upon cnv values")
+    print("patient are not filtered upon cnv values")
   } else {
-    print("patient are filter upon cnv values")
+    print("patient are filtered upon cnv values")
   }
   
   data_cnv_transcr = cbind(data_ntrscr[rownames(gene_list), tc_indivs], data_cnv[rownames(gene_list), tc_indivs])
@@ -285,13 +350,31 @@ noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_
 #' @export
 
 
-select_candidates = function(gene_list, padj_thresh, z_score_thresh, noCNVlog2FC_thresh){
-  idx_padj        = !is.na(gene_list$padj       ) &     gene_list$padj         < padj_thresh       
-  idx_z_score     = !is.na(gene_list$z_score    ) & abs(gene_list$z_score    ) < z_score_thresh    
-  idx_noCNVlog2FC = !is.na(gene_list$noCNVlog2FC) & abs(gene_list$noCNVlog2FC) > noCNVlog2FC_thresh
+select_candidates = function(gene_list, padj_thresh = 0, z_score_thresh, noCNVlog2FC_thresh){
+  if (padj_thresh == 0) {
+  print('selection with no pvalue')
+  idx_z_score     = which(!is.na(gene_list$z_score    ) & abs(gene_list$z_score    ) < z_score_thresh)    
+  idx_noCNVlog2FC = which(!is.na(gene_list$noCNVlog2FC) & abs(gene_list$noCNVlog2FC) > noCNVlog2FC_thresh)
+  idx = intersect(idx_z_score, idx_noCNVlog2FC)
+  candidate_list = gene_list[idx, ]
+  } else {
+  idx_z_score     = which(!is.na(gene_list$z_score    ) & abs(gene_list$z_score    ) < z_score_thresh)    
+  idx_noCNVlog2FC = which(!is.na(gene_list$noCNVlog2FC) & abs(gene_list$noCNVlog2FC) > noCNVlog2FC_thresh)
+  idx_padj        = which(!is.na(gene_list$padj       ) &     gene_list$padj         < padj_thresh)  
   idx = intersect(intersect(idx_padj, idx_z_score), idx_noCNVlog2FC)
   candidate_list = gene_list[idx, ]
+  }
   return(candidate_list)
 }
+
+
+# select_candidates = function(gene_list, padj_thresh, z_score_thresh, noCNVlog2FC_thresh){
+#   idx_padj        = !is.na(gene_list$padj       ) &     gene_list$padj         < padj_thresh       
+#   idx_z_score     = !is.na(gene_list$z_score    ) & abs(gene_list$z_score    ) < z_score_thresh    
+#   idx_noCNVlog2FC = !is.na(gene_list$noCNVlog2FC) & abs(gene_list$noCNVlog2FC) > noCNVlog2FC_thresh
+#   idx = intersect(intersect(idx_padj, idx_z_score), idx_noCNVlog2FC)
+#   candidate_list = gene_list[idx, ]
+#   return(candidate_list)
+# }
 
   

@@ -31,4 +31,3 @@ compute_gene_meth_profile(gene, meth_data, meth_platform, pf_pos_colname,
 \description{
 Generate  differential methylation profile for a gene around the transcription start side
 }
-
