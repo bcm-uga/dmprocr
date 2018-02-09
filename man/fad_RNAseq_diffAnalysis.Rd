@@ -5,8 +5,8 @@
 \title{Perform a Quick differential analysis of RNAseq data.}
 \usage{
 fad_RNAseq_diffAnalysis(data_trscr, exp_grp, gene_list,
-  filter_indiv = "no_filter", contrast = c("sample", "01", "11"),
-  apply_func = apply)
+  filter_indiv = "no_filter", contrast = c("tissue_status", "patho",
+  "normal"), apply_func = apply)
 }
 \arguments{
 \item{data_trscr}{A \code{data} matrix that contains transcriptome information (RNAseq counts from HTseq). Columns correspond to indivuals, row correspond to genes.}
@@ -17,7 +17,7 @@ fad_RNAseq_diffAnalysis(data_trscr, exp_grp, gene_list,
 
 \item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).}
 
-\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change}
+\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")}
 
 \item{apply_func}{Function to be used for apply.}
 }

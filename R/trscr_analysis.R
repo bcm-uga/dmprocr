@@ -10,9 +10,9 @@
 #' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
 #' @param alpha A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
-#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")
 #' @param fitType A DESeq fitting paramater, by default set to "parametric"
-#' @param normalisation_factor A matrix of normalization to preempt DESeq2 sizeFactors. Optionnal (set on "no_factor" by default).
+#' @param normalization_factor A matrix of normalization to preempt DESeq2 sizeFactors. Optionnal (set on "no_factor" by default).
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
 #' 
@@ -26,7 +26,7 @@
 #'
 #' @export
 
-RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric", normalization_factor ="no_factor") {  
+RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("tissue_status","patho","normal"), fitType="parametric", normalization_factor ="no_factor") {  
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
     filter_indiv = colnames(data_trscr)
@@ -77,7 +77,7 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
 #' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
 #' @param alpha A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
-#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")
 #' @param fitType A DESeq fitting paramater, by default set to "parametric"
 #' 
 #' @return A list composed of a \code{data_ntrscr} matrix of normalized counts and a \code{size_factor} vector of normalization factors.
@@ -91,7 +91,7 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
 #'
 #' @export
 
-RNAseq_normalization = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("sample","01","11"), fitType="parametric") {  
+RNAseq_normalization = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", alpha = 0.05, contrast=c("tissue_status","patho","normal"), fitType="parametric") {  
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the normalization process")
     filter_indiv = colnames(data_trscr)
@@ -131,7 +131,7 @@ RNAseq_normalization = function(data_trscr, exp_grp, gene_list, filter_indiv = "
 #' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.
 #' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
-#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")
 #' @param apply_func Function to be used for apply.
 #' 
 #' @return A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.
@@ -146,7 +146,7 @@ RNAseq_normalization = function(data_trscr, exp_grp, gene_list, filter_indiv = "
 #'
 #' @export
 
-fad_RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("sample","01","11"), apply_func=apply) {  
+fad_RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("tissue_status","patho","normal"), apply_func=apply) {  
   if (filter_indiv[1] == "no_filter") {
     print("all individuals will be used in the differential analysis")
     filter_indiv = colnames(data_trscr)
@@ -213,7 +213,7 @@ fad_RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv 
 
 
 
-RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv, contrast=c("sample","01","11"), cnv_filter = c(0.025, 0.975), apply_func=apply){
+RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv, contrast=c("tissue_status","patho","normal"), cnv_filter = c(0.025, 0.975), apply_func=apply){
   if (missing(filter_indiv)) {
     print("all individuals will be used in the differential analysis")
     filter_indiv = exp_grp$dmprocr_ID
@@ -308,7 +308,7 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
 #' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on \code{data_trscr} individuals.
 #' @param gene_list A \code{gene_list} bedfile containing the genes to screen for differential expression.
 #' @param filter_indiv A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).
-#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change
+#' @param contrast A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")
 #' @param no_cnv_filter A vector of two values indicating the CNV values threshold for no CNV, by default set to c(-0.2, 0.2). 
 #' 
 #' 
@@ -316,7 +316,7 @@ RNAseq_cnv_reg <- function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_ind
 #'
 #' @export
 
-noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("sample","01","11"), no_cnv_filter = c(-0.2, 0.2)){
+noCNV_diffAnalysis = function(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv = "no_filter", contrast=c("tissue_status","patho","normal"), no_cnv_filter = c(-0.2, 0.2)){
   noCNV_data = t(sapply(rownames(gene_list), function (gene) {
     # print(gene)
     # i = which(rownames(gene_list) == gene)

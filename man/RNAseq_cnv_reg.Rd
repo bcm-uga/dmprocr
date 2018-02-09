@@ -5,8 +5,8 @@
 \title{Perform linear regression on expression and CNV data.}
 \usage{
 RNAseq_cnv_reg(data_ntrscr, data_cnv, exp_grp, gene_list, filter_indiv,
-  contrast = c("sample", "01", "11"), cnv_filter = c(0.025, 0.975),
-  apply_func = apply)
+  contrast = c("tissue_status", "patho", "normal"), cnv_filter = c(0.025,
+  0.975), apply_func = apply)
 }
 \arguments{
 \item{data_ntrscr}{A \code{data} matrix that contains normalized RNAseq counts (from DESeq2 analysis). Columns correspond to indivuals, row correspond to genes.}

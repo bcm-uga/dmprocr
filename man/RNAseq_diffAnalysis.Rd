@@ -5,8 +5,9 @@
 \title{Perform differential analysis of RNAseq data.}
 \usage{
 RNAseq_diffAnalysis(data_trscr, exp_grp, gene_list,
-  filter_indiv = "no_filter", alpha = 0.05, contrast = c("sample", "01",
-  "11"), fitType = "parametric", normalization_factor = "no_factor")
+  filter_indiv = "no_filter", alpha = 0.05, contrast = c("tissue_status",
+  "patho", "normal"), fitType = "parametric",
+  normalization_factor = "no_factor")
 }
 \arguments{
 \item{data_trscr}{A \code{data} matrix that contains transcriptome information (RNAseq counts from HTseq). Columns correspond to indivuals, row correspond to genes.}
@@ -19,11 +20,11 @@ RNAseq_diffAnalysis(data_trscr, exp_grp, gene_list,
 
 \item{alpha}{A parameter to indicate the significance cutoff used by \code{DESeq2::results} funtion for optimizing the independent filtering (by default 0.05). If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.}
 
-\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change}
+\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")}
 
 \item{fitType}{A DESeq fitting paramater, by default set to "parametric"}
 
-\item{normalisation_factor}{A matrix of normalization to preempt DESeq2 sizeFactors. Optionnal (set on "no_factor" by default).}
+\item{normalization_factor}{A matrix of normalization to preempt DESeq2 sizeFactors. Optionnal (set on "no_factor" by default).}
 }
 \value{
 A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) computed by DESeq2 and a \code{data_ntrscr} matrix of normalized counts.

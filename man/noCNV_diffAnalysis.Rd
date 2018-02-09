@@ -5,8 +5,8 @@
 \title{Calculate differential expression on a subset of patient.}
 \usage{
 noCNV_diffAnalysis(data_ntrscr, data_cnv, exp_grp, gene_list,
-  filter_indiv = "no_filter", contrast = c("sample", "01", "11"),
-  no_cnv_filter = c(-0.2, 0.2))
+  filter_indiv = "no_filter", contrast = c("tissue_status", "patho",
+  "normal"), no_cnv_filter = c(-0.2, 0.2))
 }
 \arguments{
 \item{data_ntrscr}{A \code{data} matrix that contains normalized RNAseq counts (from DESeq2 analysis). Columns correspond to indivuals, row correspond to genes.}
@@ -19,7 +19,7 @@ noCNV_diffAnalysis(data_ntrscr, data_cnv, exp_grp, gene_list,
 
 \item{filter_indiv}{A vector of individual names to be screened for differential expression. Optionnal (set on "no_filter" by default).}
 
-\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change}
+\item{contrast}{A vector containing the constrast to be used to estimate the logarithmic fols change. By default: c("tissue_status","patho","normal")}
 
 \item{no_cnv_filter}{A vector of two values indicating the CNV values threshold for no CNV, by default set to c(-0.2, 0.2).}
 }
