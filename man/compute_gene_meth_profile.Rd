@@ -7,7 +7,8 @@
 compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth,
   type_of_analysis = "pop", contrast = c("tissue_status", "patho",
   "normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname,
-  updwn_str, slide, wig_size, mask_wide, apply_func = apply)
+  updwn_str, slide, wig_size, mask_wide, apply_func = apply,
+  min_DE_samples = 5)
 }
 \arguments{
 \item{gene}{A list that describe gene in bed format.}
@@ -37,6 +38,8 @@ compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth,
 \item{mask_wide}{is mask wide of o probe}
 
 \item{apply_func}{Function that will be used for apply.}
+
+\item{min_DE_samples}{A minimum of differentially expressed sample to consider a given gene as suitable for further analysis. Required if you are in the "indiv" mode.}
 }
 \description{
 Generate  differential methylation profile for a gene around the transcription start side

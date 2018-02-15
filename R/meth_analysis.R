@@ -98,16 +98,22 @@ compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv =
     stop("ERROR, filter_indiv does not fit to indivuals present in the indiv_filtering_matrix")
   }
   
+  indiv_filtering_matrix = indiv_filtering_matrix[rownames(gene_list), ]
+  
   if (length(which(rownames(indiv_filtering_matrix) %in% rownames(gene_list))) != dim(indiv_filtering_matrix)[1]) {
     stop("ERROR, indiv_filtering_matrix probes does not correspond to the probes present in the data_meth matrix")
   }
   
   #get probes associated with genes
   probe_idx = apply_func(gene_list, 1, get_probe_names, pf_meth = pf_meth, pf_chr_colname = pf_chr_colname, pf_pos_colname = pf_pos_colname, up_str=updwn_str+slide, dwn_str=updwn_str+slide)
+  idx = sapply(probe_idx, length) > 0
+  probes = probe_idx[idx]
+  probes = unique(unlist(probe_idx))
+  names(probes) = NULL
   
   #generate a matrix of reference individuals for each probe of interest
   ctrl_matrix_gene = (indiv_filtering_matrix  == 0) + 0
-  ctrl_matrix_probe = data_meth[, filter_indiv] * 0
+  ctrl_matrix_probe = data_meth[probes, filter_indiv] * 0
   for (gene in rownames(gene_list)) {
     for (probe in probe_idx[[gene]]){
       ctrl_matrix_probe[probe, ] =  ctrl_matrix_gene[gene, ]
@@ -115,12 +121,12 @@ compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv =
   }
   
   #calculate differential methylation
-  meth_value = data_meth[, filter_indiv]
+  meth_value = data_meth[probes, filter_indiv]
   meth_value[is.na(meth_value)] <- 0
   ctrl_matrix_probe[is.na(ctrl_matrix_probe)] <- 0
   nb_indiv_ctrl_by_probe = rowSums(ctrl_matrix_probe)
   mean_ctrl= (colSums(t(meth_value) * t(ctrl_matrix_probe))) / nb_indiv_ctrl_by_probe
-  diff_meth_data = data_meth[, filter_indiv] - mean_ctrl  
+  diff_meth_data = data_meth[probes, filter_indiv] - mean_ctrl  
   return(diff_meth_data)
 }
 
@@ -257,9 +263,10 @@ interpolate_gene = function(vec, probes_pos, xf, tss, updwn_str, slide) {
 #' @param pf_chr_colname string matching the name of the column in the platform that contain the chromosome information of probes
 #' @param pf_pos_colname string matching the name of the column in the platform that contain the position information of probes
 #' @param apply_func Function that will be used for apply.
+#' @param min_DE_samples A minimum of differentially expressed sample to consider a given gene as suitable for further analysis. Required if you are in the "indiv" mode.
 #'@export
 
-compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_analysis = "pop", contrast=c("tissue_status","patho","normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply) {  
+compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_analysis = "pop", contrast=c("tissue_status","patho","normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply, min_DE_samples = 5) {  
   
   probe_idx = get_probe_names(gene   , 
     pf_meth=pf_meth      , 
@@ -285,8 +292,8 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
       print(paste("For gene ", gene[[4]], ", the analysis is performed at the individual level", sep=""))
       sample_idx = which(indiv_filtering_matrix[gene[[4]], ] == 1) #select individual to test according to filtering matrix
         
-      if (length(sample_idx) == 0) {
-          warning(paste0("No DE sample for gene ", gene[[4]],"(",gene[[5]],")."))
+      if (length(sample_idx) <= min_DE_samples) {
+          warning(paste0("Less than ",  min_DE_samples, " DE samples for gene ", gene[[4]],"(",gene[[5]],")."))
          return(NULL)
           
       } 
