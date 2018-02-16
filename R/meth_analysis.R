@@ -16,21 +16,26 @@ get_probe_names = function(
   pf_pos_colname="Start"              ,
   up_str=5000                         , 
   dwn_str=5000                        
- ) {
+ ) {  
+   if (substr(gene[[1]], 1, 3) != "chr") {
+     gene[[1]] = paste0("chr",gene[[1]])
+   }
+    
+   # get gene properties
+   chr =            gene[[1]]
+   strand =         gene[[6]]
+   gene_name =      gene[[4]]
+   beg = as.numeric(gene[[2]])
+   end = as.numeric(gene[[3]])
+
+  if (nrow(meth_platform) == 0) {
+    warning(paste0("No probes for gene ", gene[[4]],"(",gene[[5]],")."))
+    return(NULL) 
+  }
    
   if (substr(meth_platform[1, pf_chr_colname], 1, 3) != "chr") {
     meth_platform[,pf_chr_colname] = paste0("chr",meth_platform[,pf_chr_colname])
   }
-  if (substr(gene[[1]], 1, 3) != "chr") {
-    gene[[1]] = paste0("chr",gene[[1]])
-  }
-    
-  # get gene properties
-  chr =            gene[[1]]
-  strand =         gene[[6]]
-  gene_name =      gene[[4]]
-  beg = as.numeric(gene[[2]])
-  end = as.numeric(gene[[3]])
   
   # get meth infos
   if (strand == "-") {
@@ -44,12 +49,12 @@ get_probe_names = function(
   }
 
   ## Compute probes associated with the gene 
-    probe_idx =   rownames(meth_platform)[
-      !is.na(meth_platform[[pf_pos_colname]]) & !is.na(meth_platform[[pf_chr_colname]]) &
-      meth_platform[[pf_chr_colname]] == chr &
-      meth_platform[[pf_pos_colname]] >= tss-up_str &
-      meth_platform[[pf_pos_colname]] < tss+dwn_str
-    ]    
+  probe_idx =   rownames(meth_platform)[
+    !is.na(meth_platform[[pf_pos_colname]]) & !is.na(meth_platform[[pf_chr_colname]]) &
+    meth_platform[[pf_chr_colname]] == chr &
+    meth_platform[[pf_pos_colname]] >= tss-up_str &
+    meth_platform[[pf_pos_colname]] < tss+dwn_str
+  ]    
 
   if (length(probe_idx) == 0) {
     warning(paste0("No probes for gene ", gene[[4]],"(",gene[[5]],")."))
