@@ -16,4 +16,3 @@ from_big_to_profile(big, xf, mask)
 \description{
 Transform a matrix of interpolated methylome signal of samples to a methyl;ome profile
 }
-

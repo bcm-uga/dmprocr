@@ -4,15 +4,26 @@
 \alias{compute_gene_meth_profile}
 \title{compute_gene_meth_profile}
 \usage{
-compute_gene_meth_profile(gene, meth_data, meth_platform, pf_pos_colname,
-  pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func = apply)
+compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth,
+  type_of_analysis = "pop", contrast = c("tissue_status", "patho",
+  "normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname,
+  updwn_str, slide, wig_size, mask_wide, apply_func = apply,
+  min_DE_samples = 5)
 }
 \arguments{
 \item{gene}{A list that describe gene in bed format.}
 
-\item{meth_data}{A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.}
+\item{exp_grp}{A \code{exp_grp} dataframe that contains metadatas on individuals and samples.}
 
-\item{meth_platform}{a data.frame with metadata types as columns names and probes ids as row names.}
+\item{data_meth}{A matrix of row methylation data with TCGA sample ids as column names and probes ids as row names.}
+
+\item{pf_meth}{a data.frame with metadata types as columns names and probes ids as row names.}
+
+\item{type_of_analysis}{A string indicating if you want to make a population or an individual analysis. Should either be "pop" or "indiv". Set on "pop" by default.}
+
+\item{contrast}{A vector containing the constrast to use to estimate the compute the methylation profiles. Required if you are in the "pop" mode.}
+
+\item{indiv_filtering_matrix}{A matrix of filter to define reference and tested individual for each probe. Required if you are in the "indiv" mode.}
 
 \item{pf_pos_colname}{string matching the name of the column in the platform that contain the position information of probes}
 
@@ -27,8 +38,9 @@ compute_gene_meth_profile(gene, meth_data, meth_platform, pf_pos_colname,
 \item{mask_wide}{is mask wide of o probe}
 
 \item{apply_func}{Function that will be used for apply.}
+
+\item{min_DE_samples}{A minimum of differentially expressed sample to consider a given gene as suitable for further analysis. Required if you are in the "indiv" mode.}
 }
 \description{
 Generate  differential methylation profile for a gene around the transcription start side
 }
-

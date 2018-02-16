@@ -22,4 +22,3 @@ interpolate_gene(vec, probes_pos, xf, tss, updwn_str, slide)
 \description{
 Build a interpolated signal of differential methylation value for a gene.
 }
-

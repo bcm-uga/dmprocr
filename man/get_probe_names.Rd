@@ -4,13 +4,13 @@
 \alias{get_probe_names}
 \title{get_probe_names}
 \usage{
-get_probe_names(gene, meth_platform, pf_chr_colname = "Chromosome",
+get_probe_names(gene, pf_meth, pf_chr_colname = "Chromosome",
   pf_pos_colname = "Start", up_str = 5000, dwn_str = 5000)
 }
 \arguments{
 \item{gene}{A vector describing the gene (line of a bed file).}
 
-\item{meth_platform}{A data frame describing CpG positions.}
+\item{pf_meth}{A data frame describing CpG positions.}
 
 \item{pf_chr_colname}{string matching the name of the column in the platform that contain the chromosome on which we find a probes.}
 
@@ -26,4 +26,3 @@ A vector of probe names
 \description{
 This function extracts probe names of a given gene from platform
 }
-
