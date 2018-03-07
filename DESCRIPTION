@@ -19,7 +19,6 @@ Imports:
     utils,
     signal,
     DESeq2,
-    kmlShape,
     graphics
 License: CeCILL
 LazyData: TRUE
