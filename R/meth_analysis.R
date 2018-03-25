@@ -117,7 +117,7 @@ compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv =
   names(probes) = NULL
   
   #generate a matrix of reference individuals for each probe of interest
-  ctrl_matrix_gene = (indiv_filtering_matrix  == 0) + 0
+  ctrl_matrix_gene = (indiv_filtering_matrix[, filter_indiv]  == 0) + 0
   ctrl_matrix_probe = data_meth[probes, filter_indiv] * 0
   for (gene in rownames(gene_list)) {
     for (probe in probe_idx[[gene]]){
