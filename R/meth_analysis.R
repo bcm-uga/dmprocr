@@ -295,7 +295,9 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
     } else if (type_of_analysis == "indiv") {
         
       print(paste("For gene ", gene[[4]], ", the analysis is performed at the individual level", sep=""))
-      sample_idx = which(indiv_filtering_matrix[gene[[4]], ] == 1) #select individual to test according to filtering matrix
+      filter_indiv = colnames(data_meth)
+      tmp_de_vec = indiv_filtering_matrix[gene[[4]],filter_indiv ] 
+      sample_idx = names(tmp_de_vec)[tmp_de_vec == 1] #select individual to test according to filtering matrix
         
       if (length(sample_idx) <= min_DE_samples) {
           warning(paste0("Less than ",  min_DE_samples, " DE samples for gene ", gene[[4]],"(",gene[[5]],")."))
