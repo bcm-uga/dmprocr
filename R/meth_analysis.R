@@ -113,7 +113,7 @@ compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv =
     stop("ERROR, indiv_filtering_matrix probes does not correspond to the probes present in the data_meth matrix")
   }
   
-  if (rownames(gene_list) %in% names(probe_idx) != length(rownames(gene_liste))) {
+  if (length(which(rownames(gene_list) %in% names(probe_idx))) != length(rownames(gene_list))) {
     stop("ERROR, probe_idx does not contain all the genes of the gene_list")
   }
   
