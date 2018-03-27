@@ -76,19 +76,23 @@ get_probe_names = function(
 #'@param exp_grp A \code{exp_grp} dataframe that contains metadatas on individuals and samples.
 #'@param data_meth A \code{meth} matrix that contains methylation information (beta values). Columns correspond to indivuals, row correspond to probes.
 #'@param filter_indiv A vector of individual names to be screened for differential methylation. Optionnal (set on "no_filter" by default).
-#'@param indiv_filtering_matrix A matrix of filter to define reference and tested individual for each probe. Rownames should be contained in rownames(gene_list) and colnames should contain \code{filter_indiv}. Reference individuals should be set to "0" and individuals to be tested should be set to "1".
+#'@param indiv_filtering_matrix A matrix of filter to define differentially expressed gene for each pathological sample for each probe. Rownames should be contained in rownames(gene_list) and colnames should contain \code{filter_indiv}. Reference individuals should be set to "0" and individuals to be tested should be set to "1".
 #'@param pf_meth A data frame describing CpG positions.
 #'@param pf_chr_colname String matching the name of the column in the platform that contain the chromosome on which we find a probes.
 #'@param pf_pos_colname String matching the name of the column in the platform that contain the position information of probes.
 #'@param updwn_str   An integer specifying up and down stream size (in bp). By default set on 5000pb. 
 #'@param slide The maximum width slide allowed when comparing two curves. By default set on 0.
 #'@param apply_func A function to be used as/instead of R \code{base::apply}. By default set on \code{base::apply}.
+#'@param contrast A vector containing the constrast to use to estimate the compute the methylation profiles. Required if you are in the "pop" mode.
+#'@param reference A string indicating what sample to considere as reference. Should be "normal" or "no_de" for all samples without differential expression (normal + patho).
+#'@param probe_idx A list of probes associated with each gene
+#'
 #'
 #'@return A matrix of differential methylation values based on single individual analysis. 
 #'
 #'@export
 
-compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv = "no_filter", indiv_filtering_matrix , pf_meth, pf_pos_colname, pf_chr_colname, updwn_str = 5000, slide= 0, apply_func = apply) {
+compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv = "no_filter", indiv_filtering_matrix , pf_meth, pf_pos_colname, pf_chr_colname, updwn_str = 5000, slide= 0, apply_func = apply, contrast=c("tissue_status","patho","normal"), reference ="normal", probe_idx) {
   
   if (filter_indiv[1] == "no_filter") {
     print("all individuals for which trscr, cnv and meth sample exist will be used in the process")
@@ -109,30 +113,50 @@ compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv =
     stop("ERROR, indiv_filtering_matrix probes does not correspond to the probes present in the data_meth matrix")
   }
   
+  if (rownames(gene_list) %in% names(probe_idx) != length(rownames(gene_liste))) {
+    stop("ERROR, probe_idx does not contain all the genes of the gene_list")
+  }
+  
+  #define reference sample
+  tmp_exp_grp = exp_grp[filter_indiv,]
+  reference_samples = rownames(tmp_exp_grp)[!is.na(tmp_exp_grp[[contrast[1]]]) & tmp_exp_grp[[contrast[1]]] == contrast[3]]
+  
   #get probes associated with genes
-  probe_idx = apply_func(gene_list, 1, get_probe_names, pf_meth = pf_meth, pf_chr_colname = pf_chr_colname, pf_pos_colname = pf_pos_colname, up_str=updwn_str+slide, dwn_str=updwn_str+slide)
+  #probe_idx = apply_func(gene_list, 1, get_probe_names, pf_meth = pf_meth, pf_chr_colname = pf_chr_colname, pf_pos_colname = pf_pos_colname, up_str=updwn_str+slide, dwn_str=updwn_str+slide)
   idx = sapply(probe_idx, length) > 0
   probes = probe_idx[idx]
   probes = unique(unlist(probe_idx))
   names(probes) = NULL
   
-  #generate a matrix of reference individuals for each probe of interest
-  ctrl_matrix_gene = (indiv_filtering_matrix[, filter_indiv]  == 0) + 0
-  ctrl_matrix_probe = data_meth[probes, filter_indiv] * 0
-  for (gene in rownames(gene_list)) {
-    for (probe in probe_idx[[gene]]){
-      ctrl_matrix_probe[probe, ] =  ctrl_matrix_gene[gene, ]
-    }
-  }
+  if (reference == "normal") {
+    mean_normal= rowMeans(data_meth[probes, reference_samples])
+    diff_meth_data = data_meth[probes, filter_indiv] - mean_normal 
   
-  #calculate differential methylation
-  meth_value = data_meth[probes, filter_indiv]
-  meth_value[is.na(meth_value)] <- 0
-  ctrl_matrix_probe[is.na(ctrl_matrix_probe)] <- 0
-  nb_indiv_ctrl_by_probe = rowSums(ctrl_matrix_probe)
-  mean_ctrl= (colSums(t(meth_value) * t(ctrl_matrix_probe))) / nb_indiv_ctrl_by_probe
-  diff_meth_data = data_meth[probes, filter_indiv] - mean_ctrl  
-  return(diff_meth_data)
+  } else if (reference == "no_de") {
+    
+    #generate a matrix of reference individuals for each probe of interest
+    ctrl_matrix_gene = (indiv_filtering_matrix[, filter_indiv]  == 0) + 0
+    ctrl_matrix_probe = data_meth[probes, filter_indiv] * 0
+    for (gene in rownames(gene_list)) {
+      for (probe in probe_idx[[gene]]){
+        ctrl_matrix_probe[probe, ] =  ctrl_matrix_gene[gene, ]
+      }
+    }
+  
+    #calculate differential methylation
+    meth_value = data_meth[probes, filter_indiv]
+    meth_value[is.na(meth_value)] <- 0
+    ctrl_matrix_probe[is.na(ctrl_matrix_probe)] <- 0
+    nb_indiv_ctrl_by_probe = rowSums(ctrl_matrix_probe)
+    mean_ctrl= (colSums(t(meth_value) * t(ctrl_matrix_probe))) / nb_indiv_ctrl_by_probe
+    mean_normal= rowMeans(data_meth[probes, reference_samples])
+    diff_meth_data = data_meth[probes, filter_indiv] - mean(mean_ctrl, mean_normal)
+    return(diff_meth_data)
+    
+  } else {
+    warning("reference parameter is incorrect")
+    return(NULL)
+  }
 }
 
 # Authors: Magali Richard, UGA
@@ -652,3 +676,77 @@ dmTable <- function(data, tested_samples, reference_samples) {
 #
 #   return(listmi)
 # }
+
+
+#' BACKUP COMPUTE INDIV DM TABLE
+#' 
+#' # Authors: Magali Richard, UGA
+#' # magali.richard@univ-grenoble-alpes.fr
+#' #
+#' #---------------------------------------------
+#' #'Compute differential mehylation table for each probe according to individual-level analysis.
+#' #'
+#' #'Generate differential methylation data table from beta values. According to a reference individual matrix which indicates which samples should be considere as reference for a given probe, the function computes the methylation difference between each tested sample and the mean of reference samples.
+#' #'
+#' #'@param gene_list A \code{gene_list} bedfile containing the genes to screen for differential methylation.
+#' #'@param exp_grp A \code{exp_grp} dataframe that contains metadatas on individuals and samples.
+#' #'@param data_meth A \code{meth} matrix that contains methylation information (beta values). Columns correspond to indivuals, row correspond to probes.
+#' #'@param filter_indiv A vector of individual names to be screened for differential methylation. Optionnal (set on "no_filter" by default).
+#' #'@param indiv_filtering_matrix A matrix of filter to define differentially expressed gene for each pathological sample for each probe. Rownames should be contained in rownames(gene_list) and colnames should contain \code{filter_indiv}. Reference individuals should be set to "0" and individuals to be tested should be set to "1".
+#' #'@param pf_meth A data frame describing CpG positions.
+#' #'@param pf_chr_colname String matching the name of the column in the platform that contain the chromosome on which we find a probes.
+#' #'@param pf_pos_colname String matching the name of the column in the platform that contain the position information of probes.
+#' #'@param updwn_str   An integer specifying up and down stream size (in bp). By default set on 5000pb. 
+#' #'@param slide The maximum width slide allowed when comparing two curves. By default set on 0.
+#' #'@param apply_func A function to be used as/instead of R \code{base::apply}. By default set on \code{base::apply}.
+#' #'
+#' #'@return A matrix of differential methylation values based on single individual analysis. 
+#' #'
+#' #'@export
+#' 
+#' compute_indiv_dm_table <- function(gene_list, exp_grp, data_meth, filter_indiv = "no_filter", indiv_filtering_matrix , pf_meth, pf_pos_colname, pf_chr_colname, updwn_str = 5000, slide= 0, apply_func = apply) {
+#'   
+#'   if (filter_indiv[1] == "no_filter") {
+#'     print("all individuals for which trscr, cnv and meth sample exist will be used in the process")
+#'     filter_indiv = rownames(exp_grp[exp_grp$trscr == 1 & exp_grp$cnv == 1 & exp_grp$meth == 1, ])
+#'   }
+#'   
+#'   if (length(which(filter_indiv %in% colnames(data_meth))) != length(filter_indiv) ) {
+#'     stop("ERROR, filter_indiv does not fit to indivuals present in the data_meth matrix")
+#'   } 
+#'   
+#'   if (length(which(filter_indiv %in% colnames(indiv_filtering_matrix))) != length(filter_indiv)) {
+#'     stop("ERROR, filter_indiv does not fit to indivuals present in the indiv_filtering_matrix")
+#'   }
+#'   
+#'   indiv_filtering_matrix = indiv_filtering_matrix[rownames(gene_list), ]
+#'   
+#'   if (length(which(rownames(indiv_filtering_matrix) %in% rownames(gene_list))) != dim(indiv_filtering_matrix)[1]) {
+#'     stop("ERROR, indiv_filtering_matrix probes does not correspond to the probes present in the data_meth matrix")
+#'   }
+#'   
+#'   #get probes associated with genes
+#'   probe_idx = apply_func(gene_list, 1, get_probe_names, pf_meth = pf_meth, pf_chr_colname = pf_chr_colname, pf_pos_colname = pf_pos_colname, up_str=updwn_str+slide, dwn_str=updwn_str+slide)
+#'   idx = sapply(probe_idx, length) > 0
+#'   probes = probe_idx[idx]
+#'   probes = unique(unlist(probe_idx))
+#'   names(probes) = NULL
+#'   
+#'   #generate a matrix of reference individuals for each probe of interest
+#'   ctrl_matrix_gene = (indiv_filtering_matrix[, filter_indiv]  == 0) + 0
+#'   ctrl_matrix_probe = data_meth[probes, filter_indiv] * 0
+#'   for (gene in rownames(gene_list)) {
+#'     for (probe in probe_idx[[gene]]){
+#'       ctrl_matrix_probe[probe, ] =  ctrl_matrix_gene[gene, ]
+#'     }
+#'   }
+#'   
+#'   #calculate differential methylation
+#'   meth_value = data_meth[probes, filter_indiv]
+#'   meth_value[is.na(meth_value)] <- 0
+#'   ctrl_matrix_probe[is.na(ctrl_matrix_probe)] <- 0
+#'   nb_indiv_ctrl_by_probe = rowSums(ctrl_matrix_probe)
+#'   mean_ctrl= (colSums(t(meth_value) * t(ctrl_matrix_probe))) / nb_indiv_ctrl_by_probe
+#'   diff_meth_data = data_meth[probes, filter_indiv] - mean_ctrl  
+#'   return(diff_meth_data)
+#' }
