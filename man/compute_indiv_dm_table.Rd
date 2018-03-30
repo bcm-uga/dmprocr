@@ -37,3 +37,4 @@ A matrix of differential methylation values based on single individual analysis.
 \description{
 Generate differential methylation data table from beta values. According to a reference individual matrix which indicates which samples should be considere as reference for a given probe, the function computes the methylation difference between each tested sample and the mean of reference samples.
 }
+
