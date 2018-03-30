@@ -282,7 +282,7 @@ interpolate_gene = function(vec, probes_pos, xf, tss, updwn_str, slide) {
 #' @param exp_grp A \code{exp_grp} dataframe that contains metadatas on individuals and samples.
 #' @param pf_meth a data.frame with metadata types as columns names and probes ids as row names.
 #' @param gene A list that describe gene in bed format.
-#' @param type_of_analysis A string indicating if you want to make a population or an individual analysis. Should either be "pop" or "indiv". Set on "pop" by default.
+#' @param type_of_analysis A string indicating if you want to make a population or an individual analysis. Could either be "pop" or "indiv". If not specifyed, all samples are take.
 #' @param contrast A vector containing the constrast to use to estimate the compute the methylation profiles. Required if you are in the "pop" mode.
 #' @param indiv_filtering_matrix A matrix of filter to define reference and tested individual for each probe. Required if you are in the "indiv" mode.
 #' @param updwn_str is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value
