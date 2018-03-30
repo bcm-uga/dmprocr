@@ -6,7 +6,9 @@
 \usage{
 compute_indiv_dm_table(gene_list, exp_grp, data_meth,
   filter_indiv = "no_filter", indiv_filtering_matrix, pf_meth, pf_pos_colname,
-  pf_chr_colname, updwn_str = 5000, slide = 0, apply_func = apply)
+  pf_chr_colname, updwn_str = 5000, slide = 0, apply_func = apply,
+  contrast = c("tissue_status", "patho", "normal"), reference = "normal",
+  probe_idx)
 }
 \arguments{
 \item{gene_list}{A \code{gene_list} bedfile containing the genes to screen for differential methylation.}
@@ -17,7 +19,7 @@ compute_indiv_dm_table(gene_list, exp_grp, data_meth,
 
 \item{filter_indiv}{A vector of individual names to be screened for differential methylation. Optionnal (set on "no_filter" by default).}
 
-\item{indiv_filtering_matrix}{A matrix of filter to define reference and tested individual for each probe. Rownames should be contained in rownames(gene_list) and colnames should contain \code{filter_indiv}. Reference individuals should be set to "0" and individuals to be tested should be set to "1".}
+\item{indiv_filtering_matrix}{A matrix of filter to define differentially expressed gene for each pathological sample for each probe. Rownames should be contained in rownames(gene_list) and colnames should contain \code{filter_indiv}. Reference individuals should be set to "0" and individuals to be tested should be set to "1".}
 
 \item{pf_meth}{A data frame describing CpG positions.}
 
@@ -30,6 +32,12 @@ compute_indiv_dm_table(gene_list, exp_grp, data_meth,
 \item{slide}{The maximum width slide allowed when comparing two curves. By default set on 0.}
 
 \item{apply_func}{A function to be used as/instead of R \code{base::apply}. By default set on \code{base::apply}.}
+
+\item{contrast}{A vector containing the constrast to use to estimate the compute the methylation profiles. Required if you are in the "pop" mode.}
+
+\item{reference}{A string indicating what sample to considere as reference. Should be "normal" or "no_de" for all samples without differential expression (normal + patho).}
+
+\item{probe_idx}{A list of probes associated with each gene}
 }
 \value{
 A matrix of differential methylation values based on single individual analysis.

@@ -48,7 +48,9 @@ RNAseq_diffAnalysis = function(data_trscr, exp_grp, gene_list, filter_indiv = "n
                                 design = as.formula(paste("~", as.factor(contrast[1]))))
   
   # If required, preempt normalization step
-  if (dim(normalization_factor)[1] > 1) {
+  if ( normalization_factor == "no_factor") {
+    print("No preemption of sizeFactors")
+  } else {
     print("Preempt sizeFactors")
     DESeq2::normalizationFactors(dds) <- normalization_factor
   }

@@ -29,3 +29,4 @@ A \code{gene_list} table including a noCNVlog2FC value associated with different
 \description{
 Calculate differential expression on a subset of patient, in particular those with no CNV
 }
+

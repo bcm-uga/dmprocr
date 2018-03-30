@@ -26,3 +26,4 @@ A vector of probe names
 \description{
 This function extracts probe names of a given gene from platform
 }
+

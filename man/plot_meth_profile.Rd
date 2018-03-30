@@ -18,3 +18,4 @@ plot_meth_profile(meth_profile, alpha.f, ylim = c(-1, 1), ...)
 \description{
 Plot methylome profile for a gene.
 }
+

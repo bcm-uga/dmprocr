@@ -29,3 +29,4 @@ A list composed of a \code{data_ntrscr} matrix of normalized counts and a \code{
 \description{
 Perform normalization of transcriptomic data (RNAseq) using DESeq2 R package.
 }
+

@@ -32,3 +32,4 @@ A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) co
 \description{
 Perform differential analysis of transcriptomic data (RNAseq) using DESeq2 R package.
 }
+

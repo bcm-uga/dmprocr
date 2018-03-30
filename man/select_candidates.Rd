@@ -22,3 +22,4 @@ A \code{gene_list} table including of candidate genes
 \description{
 Generate a candidate table
 }
+

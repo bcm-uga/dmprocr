@@ -31,3 +31,4 @@ A \code{gene_list} table including a z_score value associated with the linear mo
 \description{
 Perform linear regression on expression (counts) and CNV data.
 }
+

@@ -9,3 +9,4 @@ generate_fakestudy()
 \description{
 Generate transcriptome (HTseq counts), cnv (copy number segment) and methylation (beta values) for 500 genes, 9810 methylation probes, in 50 samples.
 }
+

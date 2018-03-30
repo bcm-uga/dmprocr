@@ -38,3 +38,4 @@ A matrix of differential methylation values based on population analysis.
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
 }
+

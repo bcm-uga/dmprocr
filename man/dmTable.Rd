@@ -16,3 +16,4 @@ dmTable(data, tested_samples, reference_samples)
 \description{
 Generate differential methylation data table from beta values. It basically extract all tumorous samples and controls. Then it computes the difference between each tumorous and the mean of control.
 }
+

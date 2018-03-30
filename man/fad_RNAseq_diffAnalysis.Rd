@@ -27,3 +27,4 @@ A \code{gene_list} table including log2FoldChange and adjusted p-value (padj) co
 \description{
 Perform a quick differential analysis of transcriptomic data (RNAseq) using non parametric test.
 }
+
