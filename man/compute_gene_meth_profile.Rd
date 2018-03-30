@@ -4,11 +4,10 @@
 \alias{compute_gene_meth_profile}
 \title{compute_gene_meth_profile}
 \usage{
-compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth,
-  type_of_analysis = "pop", contrast = c("tissue_status", "patho",
-  "normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname,
-  updwn_str, slide, wig_size, mask_wide, apply_func = apply,
-  min_DE_samples = 5)
+compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth, type_of_analysis,
+  contrast = c("tissue_status", "patho", "normal"),
+  indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str,
+  slide, wig_size, mask_wide, apply_func = apply, min_DE_samples = 5)
 }
 \arguments{
 \item{gene}{A list that describe gene in bed format.}

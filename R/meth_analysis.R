@@ -295,7 +295,7 @@ interpolate_gene = function(vec, probes_pos, xf, tss, updwn_str, slide) {
 #' @param min_DE_samples A minimum of differentially expressed sample to consider a given gene as suitable for further analysis. Required if you are in the "indiv" mode.
 #'@export
 
-compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_analysis = "pop", contrast=c("tissue_status","patho","normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply, min_DE_samples = 5) {  
+compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_analysis, contrast=c("tissue_status","patho","normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply, min_DE_samples = 5) {  
   
   probe_idx = get_probe_names(gene   , 
     pf_meth=pf_meth      , 
@@ -310,27 +310,32 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
     return(NULL)
   } else {
     
-    if (type_of_analysis == "pop") {
-      print(paste("For gene ", gene[[4]], ", the analysis is performed at the population level", sep=""))
-      filter_indiv = colnames(data_meth) #select all indivual present in data_meth matrix
-      tmp_exp_grp = exp_grp[filter_indiv, ] #filter exp_grp accordingly
-      sample_idx = rownames(tmp_exp_grp)[!is.na(tmp_exp_grp[[contrast[1]]]) & tmp_exp_grp[[contrast[1]]] == contrast[2]] #select individuals to test
-      
-    } else if (type_of_analysis == "indiv") {
-        
-      print(paste("For gene ", gene[[4]], ", the analysis is performed at the individual level", sep=""))
-      filter_indiv = colnames(data_meth)
-      tmp_de_vec = indiv_filtering_matrix[gene[[4]],filter_indiv ] 
-      sample_idx = names(tmp_de_vec)[tmp_de_vec == 1] #select individual to test according to filtering matrix
-        
-      if (length(sample_idx) <= min_DE_samples) {
-          warning(paste0("Less than ",  min_DE_samples, " DE samples for gene ", gene[[4]],"(",gene[[5]],")."))
-         return(NULL)
-          
-      } 
+    # Fch, 30 march, 2018 by default we choose to take all samples.
+    if (missing(type_of_analysis)) { 
+      sample_idx = colnames(data_meth)
     } else {
-          warning("type_of_analysis parameter is incorrect")
-          return(NULL)
+      if (type_of_analysis == "pop") {
+        print(paste("For gene ", gene[[4]], ", the analysis is performed at the population level", sep=""))
+        filter_indiv = colnames(data_meth) #select all indivual present in data_meth matrix
+        tmp_exp_grp = exp_grp[filter_indiv, ] #filter exp_grp accordingly
+        sample_idx = rownames(tmp_exp_grp)[!is.na(tmp_exp_grp[[contrast[1]]]) & tmp_exp_grp[[contrast[1]]] == contrast[2]] #select individuals to test
+      
+      } else if (type_of_analysis == "indiv") {
+        
+        print(paste("For gene ", gene[[4]], ", the analysis is performed at the individual level", sep=""))
+        filter_indiv = colnames(data_meth)
+        tmp_de_vec = indiv_filtering_matrix[gene[[4]],filter_indiv ] 
+        sample_idx = names(tmp_de_vec)[tmp_de_vec == 1] #select individual to test according to filtering matrix
+        
+        if (length(sample_idx) <= min_DE_samples) {
+            warning(paste0("Less than ",  min_DE_samples, " DE samples for gene ", gene[[4]],"(",gene[[5]],")."))
+           return(NULL)
+          
+        } 
+      } else {
+            warning("type_of_analysis parameter is incorrect")
+            return(NULL)
+      }
     }
   
           
