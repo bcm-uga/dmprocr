@@ -4,12 +4,12 @@
 \alias{interpolate_gene}
 \title{interpolate_gene}
 \usage{
-interpolate_gene(vec, probes_pos, xf, tss, updwn_str, slide)
+interpolate_gene(vec, meth_probe_pos, xf, tss, updwn_str, slide)
 }
 \arguments{
 \item{vec}{A numeric vector specifying differential methylation signal.}
 
-\item{probes_pos}{is a vector of probes position on the chromosome.}
+\item{meth_probe_pos}{is a vector of probes position on the chromosome.}
 
 \item{xf}{coordinates of interpolation}
 

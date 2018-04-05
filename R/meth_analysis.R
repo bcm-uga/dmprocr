@@ -226,17 +226,17 @@ compute_pop_dm_table = function(gene_list, exp_grp, data_meth, filter_indiv = "n
 #'
 #' @param vec A numeric vector specifying differential methylation signal.
 #' @param xf coordinates of interpolation
-#' @param probes_pos is a vector of probes position on the chromosome. 
+#' @param meth_probe_pos is a vector of probes position on the chromosome. 
 #' @param tss the transcription start site on the same chromosome.
 #' @param updwn_str is the width of the window on the chromosome in bp where the function will fetch probes position and differential methylation value, default is 5000.
 #' @param slide is the maximum width slide you'll alow when comparing two curve, default is 0.
 #'@export
-interpolate_gene = function(vec, probes_pos, xf, tss, updwn_str, slide) {
+interpolate_gene = function(vec, meth_probe_pos, xf, tss, updwn_str, slide) {
   if (sum(!is.na(vec))==0) {
     return(rep(NA, length(xf)))
   }
-  xp         <- probes_pos[order(probes_pos)]
-  yp         <- vec[order(probes_pos)]
+  xp         <- meth_probe_pos[order(meth_probe_pos)]
+  yp         <- vec[order(meth_probe_pos)]
   idx = !is.na(yp)
   xp = xp[idx]
   yp = yp[idx]
@@ -295,8 +295,13 @@ interpolate_gene = function(vec, probes_pos, xf, tss, updwn_str, slide) {
 #' @param min_DE_samples A minimum of differentially expressed sample to consider a given gene as suitable for further analysis. Required if you are in the "indiv" mode.
 #'@export
 
-compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_analysis, contrast=c("tissue_status","patho","normal"), indiv_filtering_matrix = NULL, pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply, min_DE_samples = 5) {  
-  
+compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth,
+  type_of_analysis, contrast=c("tissue_status","patho","normal"), 
+  indiv_filtering_matrix = NULL, 
+  pf_pos_colname, pf_chr_colname, updwn_str, slide, wig_size, mask_wide, apply_func=apply, 
+  min_DE_samples=5
+) {
+
   probe_idx = get_probe_names(gene   , 
     pf_meth=pf_meth      , 
     pf_pos_colname=pf_pos_colname    ,   
@@ -338,13 +343,40 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
       }
     }
   
+
+
+
+
           
     data         = data_meth[probe_idx,sample_idx]
-    probes_pos   = pf_meth[probe_idx, pf_pos_colname]
+    meth_probe_pos   = pf_meth[probe_idx, pf_pos_colname]
     strand       = gene[[6]]
     tss          = ifelse (strand == "+", as.numeric(gene[[2]]), as.numeric(gene[[3]]))
 
+    # xf = seq(tss - updwn_str - slide, tss + updwn_str + slide, by = wig_size)
+    # bins = cbind(rev(rev(xf)[-1]), xf[-1])
+    # xf = xf[-1] - wig_size/2
+    # meth_probe_bin = sapply(meth_probe_pos, function(p){
+    #   d = abs(p - xf)
+    #   min(d)
+    #   which(d == min(d))[1]
+    # })
+    #
+    # ret = sapply(1:nrow(bins), function(bin) {
+    #   tmp_probe_idx = probe_idx[meth_probe_bin == bin]
+    #   if (length(tmp_probe_idx) > 1) {
+    #     m = apply(data[tmp_probe_idx,], 2, mean)
+    #   } else if (length(tmp_probe_idx) == 0) {
+    #     m = data[tmp_probe_idx,]
+    #   } else {
+    #     m = rep(NA, ncol(data))
+    #   }
+    #   m
+    # })
+    # return(ret)
+
     xf = seq(tss - updwn_str - slide, tss + updwn_str + slide, by = wig_size)
+    xf = xf[-1] - wig_size/2
 
     if  (length(probe_idx) == 1) {
       data = t(data)
@@ -354,7 +386,7 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
       data , 2,
       # vec = data[,5]
       interpolate_gene      ,
-      probes_pos=probes_pos ,
+      meth_probe_pos=meth_probe_pos   ,
       xf=xf                 ,
       tss=tss               ,
       updwn_str=updwn_str               ,
@@ -362,7 +394,7 @@ compute_gene_meth_profile = function(gene, exp_grp, data_meth, pf_meth, type_of_
     )      
 
     mask = as.numeric(sapply(xf, function(x) {
-      min(abs(x - probes_pos)) <= mask_wide
+      min(abs(x - meth_probe_pos)) <= mask_wide
     }))
 
     profile = from_big_to_profile(big, xf, mask)
@@ -410,6 +442,7 @@ from_big_to_profile = function(big, xf, mask) {
 #' @param meth_profile a list of dmProfile
 #' @param alpha.f a numeric specifying transparency of convolved signal.
 #' @param ylim plot function parameter.
+#' @param ADD logical, add to current plot device
 #' @param ... args pass to plot
 #' @importFrom graphics lines
 #' @importFrom graphics plot
@@ -417,8 +450,10 @@ from_big_to_profile = function(big, xf, mask) {
 #' @importFrom grDevices adjustcolor
 #'
 #'@export
-plot_meth_profile = function(meth_profile, alpha.f, ylim=c(-1,1), ...){
-  plot(meth_profile$x, meth_profile$y, ylim=ylim, type="l", ...)
+plot_meth_profile = function(meth_profile, alpha.f, ylim=c(-1,1), ADD=FALSE, ...){
+  if (!ADD) {
+    plot(meth_profile$x, meth_profile$y, ylim=ylim, type="l", ...)    
+  }
   lines(meth_profile$x, meth_profile$mask, col=2)
   lines(meth_profile$x, meth_profile$y + 2* sqrt(meth_profile$var), lty=2)
   lines(meth_profile$x, meth_profile$y - 2* sqrt(meth_profile$var), lty=2)  

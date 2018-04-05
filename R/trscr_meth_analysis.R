@@ -2,15 +2,15 @@
 #'
 #' This function analyse transcriptome and methylome study
 
-#' @param gene_symbol the symbol of the gene  
+#' @param gene the line of the bed file corresponding to the gene to analyse  
 #' @param s_cnv cnv study
 #' @param s_meth  methylome study
 #' @param s_trscr transcriptome study
 #' @param gene_indexed_probes a list of probes, indexed by gene_symbol
 #' @export
-trscr_meth_analysis = function(gene_symbol, s_cnv, s_meth, s_trscr, gene_indexed_probes) {
+trscr_meth_analysis = function(gene, s_cnv, s_meth, s_trscr, gene_indexed_probes) {
+  gene_symbol = gene[[4]]
   print(gene_symbol)
-  
   meth_probe_idx = gene_indexed_probes[[gene_symbol]]
   if (length(meth_probe_idx) <= 1) {
     return(NULL)
@@ -88,7 +88,6 @@ plot_trscr_meth_analysis = function(results) {
     tissue_status = 1    
   }
 
-  layout(matrix(c(1,1, 4, 2, 2, 3, 2, 2, 3), 3), respect=TRUE)
   main = main = paste0(study_name, " - ", gene_symbol)
   plot(trscr_data, 1:length(trscr_data), main=main, xlab="log2(normalized expression)", ylab=paste0(length(trscr_data), " samples"), yaxt="n", col=as.factor(tissue_status))
 
@@ -105,20 +104,54 @@ plot_trscr_meth_analysis = function(results) {
   plot(scores, ylab="mi score", type="l", xaxt="n", xlab="")
   axis(1, 1:nrow(meth_data), rownames(meth_data), las=2)
 
-  # gene = genes[gene_symbol,]
-  # strand = gene[[6]]
-  # if (strand == "+") {
-  #   tss = gene[[2]]
-  #   beg = gene[[2]]
-  #   end = gene[[3]]
-  # } else {
-  #   tss = gene[[3]]
-  #   beg = gene[[3]]
-  #   end = gene[[2]]
-  # }
+  gene = genes[gene_symbol,]
+  strand = gene[[6]]
+  if (strand == "+") {
+    tss = gene[[2]]
+    beg = gene[[2]]
+    end = gene[[3]]
+  } else {
+    tss = gene[[3]]
+    beg = gene[[3]]
+    end = gene[[2]]
+  }
 
-  # y_base = 0
-  # pos_x = pf_orig[meth_probe_idx, pf_pos_colname]
+  y_base = 0
+  meth_probe_idx = gene_indexed_probes[[gene_symbol]]
+  meth_probe_pos = pf_orig[meth_probe_idx, pf_pos_colname]
+  
+  
+  
+  updwn_str = max(up_str, dwn_str)
+  slide = 0
+  wig_size = 1000
+  xf = seq(tss - updwn_str - slide, tss + updwn_str + slide, by = wig_size)
+  bins = cbind(rev(rev(xf)[-1]), xf[-1])
+  xf = xf[-1] - wig_size/2
+  meth_probe_bin = sapply(meth_probe_pos, function(p){
+    d = abs(p - xf)
+    min(d)
+    which(d == min(d))[1]
+  })
+
+  foo = lapply(1:nrow(bins), function(bin) {
+    tmp_probe_idx = meth_probe_idx[meth_probe_bin == bin]
+    if (length(tmp_probe_idx) > 1) {
+      m = apply(meth_data[tmp_probe_idx,], 2, mean)
+    } else if (length(tmp_probe_idx) == 0) {
+      m = meth_data[tmp_probe_idx,]
+    } else {
+      m = rep(NA, ncol(meth_data))
+    }
+    m
+  })
+  foo = do.call(rbind, foo)
+  return(foo)
+
+  
+  
+  
+  
 
 
   # plot(0, 0, col = 0, xlim = c(tss - max(up_str, dwn_str),
@@ -128,9 +161,9 @@ plot_trscr_meth_analysis = function(results) {
   # axis(2, 0:1)
   #
   # x_pb = seq(tss - max(up_str, dwn_str),  tss + max(up_str, dwn_str), length.out=length(meth_probe_idx))
-  # arrows(pos_x, -0.1, pos_x, -0.1+0.01, length = 0)
+  # arrows(meth_probe_pos, -0.1, meth_probe_pos, -0.1+0.01, length = 0)
   # arrows(x_pb, -0.2, x_pb, -0.2+0.01, length = 0)
-  # arrows(pos_x, -0.1, x_pb, -0.2+0.01, length = 0)
+  # arrows(meth_probe_pos, -0.1, x_pb, -0.2+0.01, length = 0)
   # text(pos=2, x_pb+(x_pb[2]-x_pb[1])/2, -0.2-0.01, meth_probe_idx, las=2, srt=90, cex=.3)
   #
   #
@@ -151,8 +184,8 @@ plot_trscr_meth_analysis = function(results) {
   #
   # m = apply(meth_data, 1, mean)
   # s = apply(meth_data, 1, sd)
-  # lines(pos_x, m)
-  # lines(pos_x, m-s, lty=2)
-  # lines(pos_x, m+s, lty=2)
+  # lines(meth_probe_pos, m)
+  # lines(meth_probe_pos, m-s, lty=2)
+  # lines(meth_probe_pos, m+s, lty=2)
 }
 

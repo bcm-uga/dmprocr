@@ -4,10 +4,10 @@
 \alias{trscr_meth_analysis}
 \title{Analyse transcriptome and methylome study}
 \usage{
-trscr_meth_analysis(gene_symbol, s_cnv, s_meth, s_trscr, gene_indexed_probes)
+trscr_meth_analysis(gene, s_cnv, s_meth, s_trscr, gene_indexed_probes)
 }
 \arguments{
-\item{gene_symbol}{the symbol of the gene}
+\item{gene}{the line of the bed file corresponding to the gene to analyse}
 
 \item{s_cnv}{cnv study}
 

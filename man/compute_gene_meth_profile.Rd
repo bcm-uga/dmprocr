@@ -18,7 +18,7 @@ compute_gene_meth_profile(gene, exp_grp, data_meth, pf_meth, type_of_analysis,
 
 \item{pf_meth}{a data.frame with metadata types as columns names and probes ids as row names.}
 
-\item{type_of_analysis}{A string indicating if you want to make a population or an individual analysis. Should either be "pop" or "indiv". Set on "pop" by default.}
+\item{type_of_analysis}{A string indicating if you want to make a population or an individual analysis. Could either be "pop" or "indiv". If not specifyed, all samples are take.}
 
 \item{contrast}{A vector containing the constrast to use to estimate the compute the methylation profiles. Required if you are in the "pop" mode.}
 

@@ -4,7 +4,7 @@
 \alias{plot_meth_profile}
 \title{plot_meth_profile}
 \usage{
-plot_meth_profile(meth_profile, alpha.f, ylim = c(-1, 1), ...)
+plot_meth_profile(meth_profile, alpha.f, ylim = c(-1, 1), ADD = FALSE, ...)
 }
 \arguments{
 \item{meth_profile}{a list of dmProfile}
@@ -12,6 +12,8 @@ plot_meth_profile(meth_profile, alpha.f, ylim = c(-1, 1), ...)
 \item{alpha.f}{a numeric specifying transparency of convolved signal.}
 
 \item{ylim}{plot function parameter.}
+
+\item{ADD}{logical, add to current plot device}
 
 \item{...}{args pass to plot}
 }
