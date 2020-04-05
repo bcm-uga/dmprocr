@@ -10,8 +10,8 @@
 #' @export
 trscr_meth_analysis = function(gene, s_cnv, s_meth, s_trscr, gene_indexed_probes) {
   gene_symbol = gene[[4]]
-  print(gene_symbol)
-  meth_probe_idx = gene_indexed_probes[[gene_symbol]]
+  # print(gene_symbol)
+  meth_probe_idx = intersect(rownames(s_meth$data), gene_indexed_probes[[gene_symbol]])
   if (length(meth_probe_idx) <= 1) {
     return(NULL)
   } 
