@@ -18,6 +18,7 @@ Imports:
     stats,
     utils,
     signal,
+    DESeq2,
     entropy,
     graphics
 License: CeCILL
